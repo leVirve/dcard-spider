@@ -91,3 +91,6 @@ ENV/
 # Pycharm stuff
 .idea
 
+# data collection
+data/
+
