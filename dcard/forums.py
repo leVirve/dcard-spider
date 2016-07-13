@@ -1,6 +1,9 @@
-from dcard import api
-from dcard.utils import get, filter_general
-
+try:
+    from dcard import api
+    from dcard.utils import get, filter_general
+except ImportError:
+    from . import api
+    from .utils import get, filter_general
 
 class DcardForum:
 

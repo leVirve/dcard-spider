@@ -1,9 +1,13 @@
 from functools import partial
 
-from dcard import api
-from dcard.forums import DcardForum
-from dcard.utils import get
-
+try:
+    from dcard import api
+    from dcard.forums import DcardForum
+    from dcard.utils import get
+except ImportError:
+    from . import api
+    from .forums import DcardForum
+    from .utils import get
 
 __all__ = ['Dcard']
 
