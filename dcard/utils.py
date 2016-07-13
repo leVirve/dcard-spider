@@ -2,11 +2,14 @@ import requests
 import logging
 
 
-def get(url, verbose=False, **kwargs):
-    response = requests.get(url, **kwargs)
-    if verbose:
-        logging.info(response.url)
-    return response.json()
+class Client:
+
+    @staticmethod
+    def get(url, verbose=False, **kwargs):
+        response = requests.get(url, **kwargs)
+        if verbose:
+            logging.info(response.url)
+        return response.json()
 
 
 def filter_general(forums):

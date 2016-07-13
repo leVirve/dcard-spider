@@ -1,18 +1,21 @@
 from dcard import Dcard
-from pymongo import MongoClient
-from pprint import pprint as print
+# from pymongo import MongoClient
 
 
-client = MongoClient()
-db = client.dcard
+# client = MongoClient()
+# db = client.dcard
 
 
 if __name__ == '__main__':
     dcard = Dcard()
 
-    a = dcard.get_forums(no_school=True)
-    b = dcard.get_post_ids('graduate', pages=2)
-    print(len(b))
+    forums = dcard.forums.get(no_school=True)
+    print(len(forums))
 
-    rid = db.forums.count()
-    print(rid)
+    ariticle_metas = dcard.forums('funny').get_metas(pages=2, sort='new')
+    print(len(ariticle_metas))
+
+    article = dcard.posts(id=4535, metas[0])
+
+    # result = db.forums.count()
+    # print(result)

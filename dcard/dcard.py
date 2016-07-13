@@ -1,13 +1,11 @@
-from functools import partial
-
 try:
     from dcard import api
     from dcard.forums import DcardForum
-    from dcard.utils import get
+    from dcard.utils import Client
 except ImportError:
     from . import api
     from .forums import DcardForum
-    from .utils import get
+    from .utils import Client
 
 __all__ = ['Dcard']
 
@@ -15,9 +13,6 @@ __all__ = ['Dcard']
 class Dcard:
 
     forums = DcardForum
-
-    get_newest_post_metas = partial(DcardForum.get_post_metas, params={'popular': False})
-    get_most_popular_post_metas = partial(DcardForum.get_post_metas, params={'popular': True})
 
     @staticmethod
     def get_post_content(post_meta):
@@ -31,11 +26,11 @@ class Dcard:
 
         params = {}
 
-        content = get(post_url)
-        links = get(links_url)
+        content = Client.get(post_url)
+        links = Client.get(links_url)
         comments = []
         while True:
-            _comments = get(comments_url, params=params, verbose=True)
+            _comments = Client.get(comments_url, params=params, verbose=True)
             if len(_comments) == 0:
                 break
             comments += _comments
