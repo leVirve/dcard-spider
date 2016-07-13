@@ -19,16 +19,16 @@ def test_post_metas(forums):
     params = {'popular': False}
     for f in forums.get('no_school'):
         forum = f['alias']
-        metas = Dcard.get_post_metas(forum, params=params)
+        metas = Dcard.get_newest_post_metas(forum, params=params)
         assert 0 <= len(metas) <= 30
 
 
 def test_post_ids(forums):
     for f in forums.get('no_school'):
         forum = f['alias']
-        ids0 = Dcard.get_post_ids(forum, pages=0)
-        ids1 = Dcard.get_post_ids(forum, pages=1)
-        ids = Dcard.get_post_ids(forum)
+        ids0 = Dcard.get_newest_post_metas(forum, pages=0)
+        ids1 = Dcard.get_newest_post_metas(forum)
+        ids = Dcard.get_newest_post_metas(forum, pages=3)
         assert len(ids0) == 0
         assert 0 <= len(ids1) <= 30
         assert 0 <= len(ids) <= 90
@@ -39,6 +39,6 @@ def test_post_ids(forums):
 
 
 def test_post_bundle():
-    post = Dcard.get_post_content(224341009)
+    post = Dcard.get_post_content({'id': 224341009})
     comment_count = post['content']['commentCount']
     assert comment_count == len(post['comments'])
