@@ -4,9 +4,13 @@ from dcard import Dcard
 
 @pytest.fixture()
 def forums():
-    all_forums = Dcard.get_forums()
-    no_school_forums = Dcard.get_forums(no_school=True)
-    return {'all': all_forums, 'no_school': no_school_forums}
+    all_forums = Dcard.forums.get()
+    no_school_forums = Dcard.forums.get(no_school=True)
+    return {
+        'all': all_forums,
+        'no_school': no_school_forums,
+        'test': no_school_forums[5:8]
+    }
 
 
 def test_forums(forums):
@@ -17,14 +21,14 @@ def test_forums(forums):
 
 def test_post_metas(forums):
     params = {'popular': False}
-    for f in forums.get('no_school'):
+    for f in forums.get('test'):
         forum = f['alias']
         metas = Dcard.get_newest_post_metas(forum, params=params)
         assert 0 <= len(metas) <= 30
 
 
 def test_post_ids(forums):
-    for f in forums.get('no_school'):
+    for f in forums.get('test'):
         forum = f['alias']
         ids0 = Dcard.get_newest_post_metas(forum, pages=0)
         ids1 = Dcard.get_newest_post_metas(forum)
