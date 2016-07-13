@@ -15,7 +15,8 @@ if __name__ == '__main__':
     ariticle_metas = dcard.forums('funny').get_metas(pages=2, sort='new')
     print(len(ariticle_metas))
 
-    article = dcard.posts(id=4535, metas[0])
+    article = dcard.posts.get(post_id=224341009)
+    print(article)
 
     # result = db.forums.count()
     # print(result)

@@ -20,29 +20,28 @@ def test_forums(forums):
 
 
 def test_post_metas(forums):
-    params = {'popular': False}
     for f in forums.get('test'):
         forum = f['alias']
-        metas = Dcard.get_newest_post_metas(forum, params=params)
+        metas = Dcard.forums(forum).get_metas(sort='popular')
         assert 0 <= len(metas) <= 30
 
 
 def test_post_ids(forums):
     for f in forums.get('test'):
         forum = f['alias']
-        ids0 = Dcard.get_newest_post_metas(forum, pages=0)
-        ids1 = Dcard.get_newest_post_metas(forum)
-        ids = Dcard.get_newest_post_metas(forum, pages=3)
-        assert len(ids0) == 0
-        assert 0 <= len(ids1) <= 30
-        assert 0 <= len(ids) <= 90
+        metas0 = Dcard.forums(forum).get_metas(pages=0)
+        metas1 = Dcard.forums(forum).get_metas()
+        metas = Dcard.forums(forum).get_metas(pages=3)
+        assert len(metas0) == 0
+        assert 0 <= len(metas1) <= 30
+        assert 0 <= len(metas) <= 90
 
-        assert len(ids1) == 30
-        assert len(ids) == 90
+        assert len(metas1) == 30
+        assert len(metas) == 90
         break
 
 
 def test_post_bundle():
-    post = Dcard.get_post_content({'id': 224341009})
+    post = Dcard.posts.get({'id': 224341009})
     comment_count = post['content']['commentCount']
     assert comment_count == len(post['comments'])
