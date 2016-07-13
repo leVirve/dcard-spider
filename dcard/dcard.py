@@ -31,8 +31,8 @@ class Dcard:
             api_posts=Dcard.POSTS,
             forum=forum
         )
-        articles = get(url, params=params)
-        return articles
+        article_metas = get(url, params=params)
+        return article_metas
 
     @staticmethod
     def get_post_ids(forum, pages=3):
