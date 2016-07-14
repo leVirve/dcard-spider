@@ -41,6 +41,6 @@ def test_post_ids(forums):
 
 
 def test_post_bundle():
-    post = Dcard.posts.get({'id': 224341009})
+    post = Dcard.posts.get({'id': 224341009})[0]
     comment_count = post['content']['commentCount']
     assert comment_count == len(post['comments'])

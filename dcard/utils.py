@@ -1,8 +1,13 @@
-import requests
 import logging
+
+import requests
+from requests_futures.sessions import FuturesSession
 
 
 class Client:
+
+    def __init__(self):
+        self.session = FuturesSession(max_workers=10)
 
     @staticmethod
     def get(url, verbose=False, **kwargs):
@@ -10,6 +15,9 @@ class Client:
         if verbose:
             logging.info(response.url)
         return response.json()
+
+    def sget(self, url, **kwargs):
+        return self.session.get(url, **kwargs)
 
 
 def filter_general(forums):

@@ -5,8 +5,13 @@ except ImportError:
     from . import api
     from .utils import Client
 
+client = Client()
+
 
 class Post:
+
+    def __init__(self):
+        pass
 
     @staticmethod
     def build_url(post_id):
@@ -19,21 +24,21 @@ class Post:
 
     @staticmethod
     def get_content(post_url):
-        return Client.get(post_url)
+        return client.sget(post_url)
 
     @staticmethod
     def get_links(post_url):
         links_url = '{post_url}/links'.format(post_url=post_url)
-        return Client.get(links_url)
+        return client.sget(links_url)
 
     @staticmethod
     def get_comments(post_url):
         comments_url = '{post_url}/comments'.format(post_url=post_url)
-        
+
         params = {}
         comments = []
         while True:
-            _comments = Client.get(comments_url, params=params, verbose=True)
+            _comments = Client.get(comments_url, params=params)
             if len(_comments) == 0:
                 break
             comments += _comments
@@ -42,21 +47,43 @@ class Post:
         return comments
 
     @staticmethod
-    def single_get(post_meta=None, post_id=None):
-        post_id = post_id if post_id else post_meta['id']
-        post_url = Post.build_url(post_id)
-        return {
-            'content': Post.get_content(post_url),
-            'links': Post.get_links(post_url),
-            'comments': Post.get_comments(post_url)
-        }
+    def _get(post_ids, **kwargs):
 
+        post_urls = [Post.build_url(i) for i in post_ids]
+
+        crawl_links    = kwargs.get('links', True)
+        crawl_content  = kwargs.get('content', True)
+        crawl_comments = kwargs.get('comments', True)
+
+        if crawl_links:
+            links_futures = [Post.get_links(url) for url in post_urls]
+        if crawl_content:
+            content_futures = [Post.get_content(url) for url in post_urls]
+
+        results = [{}] * len(post_urls)
+        if crawl_links:
+            for i, f in enumerate(links_futures):
+                results[i]['links'] = f.result().json()
+        if crawl_content:
+            for i, f in enumerate(content_futures):
+                results[i]['content'] = f.result().json()
+        if crawl_comments:
+            for i, url in enumerate(post_urls):
+                results[i]['comments'] = Post.get_comments(url)
+
+        return results
 
     @staticmethod
-    def get(post_meta=None, post_id=None):
-        if isinstance(post_meta, list):
-            return [Post.single_get(m) for m in post_meta]
-        elif isinstance(post_id, list):
-            return [Post.single_get(i) for i in post_id]
-        else:
-            return Post.single_get(post_meta=post_meta, post_id=post_id)
+    def get(post_meta=None, post_id=None, **kwargs):
+        ids = []
+        if post_meta:
+            if isinstance(post_meta, list):
+                ids = [m['id'] for m in post_meta]
+            else:
+                ids = [post_meta['id']]
+        if post_id:
+            if isinstance(post_id, list):
+                ids = post_id
+            else:
+                ids = [post_id]
+        return Post._get(ids, **kwargs)
