@@ -6,8 +6,8 @@ except ImportError:
     from .utils import Client
 
 
-class DcardPost:
-    
+class Post:
+
     @staticmethod
     def get(post_meta=None, post_id=None):
 
