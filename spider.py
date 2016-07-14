@@ -9,6 +9,7 @@ def collect_ids(metas):
 if __name__ == '__main__':
     dcard = Dcard()
 
-    t = time.perf_counter()
-    r = dcard.forums('funny').get_metas(pages=20, callback=collect_ids)
-    print('{:.5f}'.format(time.perf_counter() - t))
+    t = time.time()
+    ids = dcard.forums('funny').get_metas(pages=5, callback=collect_ids)
+    print('{:.5f}'.format(time.time() - t))
+    print(len(ids))

@@ -9,7 +9,7 @@ def forums():
     return {
         'all': all_forums,
         'no_school': no_school_forums,
-        'test': no_school_forums[5:8]
+        'test': no_school_forums[5:6]
     }
 
 
@@ -38,7 +38,6 @@ def test_post_ids(forums):
 
         assert len(metas1) == 30
         assert len(metas) == 90
-        break
 
 
 def test_post_bundle():
