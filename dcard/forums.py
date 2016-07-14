@@ -1,3 +1,4 @@
+import logging
 try:
     from dcard import api
     from dcard.utils import Client, filter_general
@@ -42,9 +43,11 @@ class Forum:
     def get_post_metas(forum, pages, params):
         metas = []
         for _ in range(pages):
-            metas += Client.get(Forum.build_url(forum), params=params)
+            data = Client.get(Forum.build_url(forum), params=params)
             try:
-                params['before'] = metas[-1]['id']
+                params['before'] = data[-1]['id']
+                metas += data
             except IndexError:
+                logging.info('第%d頁，已經沒有文章囉!' % _)
                 break
         return metas

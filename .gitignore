@@ -94,3 +94,8 @@ ENV/
 # data collection
 data/
 
+# demo script
+untitled*.py
+
+# script profile
+*.profile
