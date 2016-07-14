@@ -22,7 +22,11 @@ class Forum:
         results = []
         for metas in Forum.get_post_metas(self.forum, pages=pages, params=params):
             result = callback(metas) if callback else metas
-            results += result if isinstance(result, list) else results.append(result)
+            if isinstance(result, list):
+                results += result
+            else:
+                results.append(result)
+        logger.info('資訊蒐集完成，共%d筆' % len(results))
         return results
 
     @staticmethod
