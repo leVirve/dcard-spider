@@ -6,7 +6,14 @@ except ImportError:
     from .utils import Client, filter_general
 
 
-class DcardForum:
+class Forum:
+
+    def __init__(self, forum):
+        self.forum = forum
+
+    def get_metas(self, pages=1, sort='new'):
+        params = {'popular': True if sort == 'popular' else False}
+        return Forum.get_post_metas(self.forum, pages=pages, params=params)
 
     @staticmethod
     def get(**kwargs):
@@ -22,29 +29,22 @@ class DcardForum:
         return forums
 
     @staticmethod
-    def _get_single_page(forum, params):
+    def build_url(forum):
         url = '{api_root}/{api_forums}/{forum}/{api_posts}'.format(
             api_root=api.API_ROOT,
             api_forums=api.FORUMS,
             api_posts=api.POSTS,
             forum=forum
         )
-        return Client.get(url, params=params)
+        return url
 
     @staticmethod
     def get_post_metas(forum, pages, params):
         metas = []
         for _ in range(pages):
-            metas += DcardForum._get_single_page(forum, params)
+            metas += Client.get(Forum.build_url(forum), params=params)
             try:
                 params['before'] = metas[-1]['id']
             except IndexError:
                 break
         return metas
-
-    def get_metas(self, pages=1, sort='new'):
-        params = {'popular': True if sort == 'popular' else False}
-        return DcardForum.get_post_metas(self.forum, pages=pages, params=params)
-
-    def __init__(self, forum):
-        self.forum = forum

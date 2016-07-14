@@ -1,8 +1,8 @@
 try:
-    from dcard.forums import DcardForum
+    from dcard.forums import Forum
     from dcard.posts import DcardPost
 except ImportError:
-    from .forums import DcardForum
+    from .forums import Forum
     from .posts import DcardPost
 
 __all__ = ['Dcard']
@@ -10,5 +10,5 @@ __all__ = ['Dcard']
 
 class Dcard:
 
-    forums = DcardForum
+    forums = Forum
     posts = DcardPost
