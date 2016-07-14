@@ -7,6 +7,9 @@ except ImportError:
     from .utils import Client, filter_general
 
 
+logger = logging.getLogger('dcard')
+
+
 class Forum:
 
     def __init__(self, forum):
@@ -41,6 +44,7 @@ class Forum:
 
     @staticmethod
     def get_post_metas(forum, pages, params):
+        logger.info('開始取得看板 [%s] 內文章資訊' % forum)
         metas = []
         for _ in range(pages):
             data = Client.get(Forum.build_url(forum), params=params)
@@ -48,6 +52,6 @@ class Forum:
                 params['before'] = data[-1]['id']
                 metas += data
             except IndexError:
-                logging.info('第%d頁，已經沒有文章囉!' % _)
+                logger.warning('已到最末頁，第%d頁!' % _)
                 break
         return metas
