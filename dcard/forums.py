@@ -26,7 +26,7 @@ class Forum:
                 results += result
             else:
                 results.append(result)
-        logger.info('資訊蒐集完成，共%d筆' % len(results))
+        logger.info(u'資訊蒐集完成，共%d筆' % len(results))
         return results
 
     @staticmethod
@@ -54,12 +54,12 @@ class Forum:
 
     @staticmethod
     def get_post_metas(forum, pages, params):
-        logger.info('開始取得看板 [%s] 內文章資訊' % forum)
+        logger.info(u'開始取得看板 [%s] 內文章資訊' % forum)
         for _ in range(pages):
             data = Client.get(Forum.build_url(forum), params=params)
             try:
                 params['before'] = data[-1]['id']
                 yield data
             except IndexError:
-                logger.warning('已到最末頁，第%d頁!' % _)
+                logger.warning(u'已到最末頁，第%d頁!' % _)
                 break
