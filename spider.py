@@ -15,6 +15,6 @@ if __name__ == '__main__':
     print(len(ids))
 
     t = time.time()
-    articles = dcard.posts.get(post_id=ids[:10], comments=False)
+    articles = dcard.posts(ids[:15]).get(comments=False)
     print('{:.5f}'.format(time.time() - t))
     print(len(articles))

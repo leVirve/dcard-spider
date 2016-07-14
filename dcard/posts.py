@@ -10,8 +10,17 @@ client = Client()
 
 class Post:
 
-    def __init__(self):
-        pass
+    def __init__(self, metas):
+        '''
+        params `metas`: list of article_metas/ids, or one article_meta/id,
+                        article_meta must contain `id` field
+        '''
+        if isinstance(metas, list):
+            first = metas[0]
+            ids = [meta['id'] for meta in metas] if isinstance(first, dict) else metas
+        else:
+            ids = [metas['id']] if isinstance(metas, dict) else [metas]
+        self.ids = ids
 
     @staticmethod
     def build_url(post_id):
@@ -46,10 +55,8 @@ class Post:
 
         return comments
 
-    @staticmethod
-    def _get(post_ids, **kwargs):
-
-        post_urls = [Post.build_url(i) for i in post_ids]
+    def get(self, **kwargs):
+        post_urls = [Post.build_url(i) for i in self.ids]
 
         crawl_links    = kwargs.get('links', True)
         crawl_content  = kwargs.get('content', True)
@@ -71,19 +78,4 @@ class Post:
             for i, url in enumerate(post_urls):
                 results[i]['comments'] = Post.get_comments(url)
 
-        return results
-
-    @staticmethod
-    def get(post_meta=None, post_id=None, **kwargs):
-        ids = []
-        if post_meta:
-            if isinstance(post_meta, list):
-                ids = [m['id'] for m in post_meta]
-            else:
-                ids = [post_meta['id']]
-        if post_id:
-            if isinstance(post_id, list):
-                ids = post_id
-            else:
-                ids = [post_id]
-        return Post._get(ids, **kwargs)
+        return results[0] if len(results) == 1 else results
