@@ -67,7 +67,7 @@ class Post:
         if crawl_content:
             content_futures = [Post.get_content(url) for url in post_urls]
 
-        results = [{}] * len(post_urls)
+        results = [{} for _ in range(len(post_urls))]
         if crawl_links:
             for i, f in enumerate(links_futures):
                 results[i]['links'] = f.result().json()
