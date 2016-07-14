@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import logging
 try:
     from dcard import api
