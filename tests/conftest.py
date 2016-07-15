@@ -14,5 +14,5 @@ def forums():
 
 
 @pytest.fixture(scope='module')
-def article_url():
-    return Dcard.posts.build_url(224341009)
+def article_id():
+    return 224341009
