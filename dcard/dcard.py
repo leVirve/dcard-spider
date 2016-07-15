@@ -1,6 +1,5 @@
 import re
 import os
-import requests
 from multiprocessing.dummy import Pool
 try:
     from dcard.forums import Forum
@@ -16,21 +15,10 @@ __all__ = ['Dcard']
 reg_images    = re.compile('http[s]?://\S+\.(?:jpg|png|gif)')
 reg_imgur     = re.compile('http[s]?://imgur.com/(\w+)')
 reg_imgur_file = re.compile('http[s]?://i.imgur.com/\w+\.(?:jpg|png|gif)')
+pattern_imgur_file = 'http://i.imgur.com/{img_hash}.jpg'
 
 
-def download(task):
-    src, folder = task
-    file_name = os.path.basename(src)
-
-    response = requests.get(src, stream=True)
-    if response.ok:
-        with open('%s/%s' % (folder, file_name), 'wb') as stream:
-            for chunk in response.iter_content(chunk_size=1024):
-                stream.write(chunk)
-        print('File: %s is downloaded.' % file_name)
-
-
-threadPool = Pool(processes=8)
+thread_pool = Pool(processes=8)
 
 
 class Dcard:
@@ -78,5 +66,5 @@ class Dcard:
     def find_images(raw_data):
         imgurs = reg_imgur.findall(raw_data)
         imgur_files = reg_imgur_file.findall(raw_data)
-        imgur_files += ['http://i.imgur.com/%s.jpg' % r for r in imgurs]
+        imgur_files += [pattern_imgur_file.format(img_hash=r) for r in imgurs]
         return imgur_files
