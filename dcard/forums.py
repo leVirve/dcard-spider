@@ -3,13 +3,19 @@
 import logging
 try:
     from dcard import api
-    from dcard.utils import Client, filter_general
+    from dcard.utils import Client
 except ImportError:
     from . import api
-    from .utils import Client, filter_general
+    from .utils import Client
 
 
 logger = logging.getLogger('dcard')
+
+
+def filter_general(forums):
+    for forum in forums:
+        if not forum['isSchool']:
+            yield forum
 
 
 class Forum:
