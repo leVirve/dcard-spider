@@ -1,9 +1,8 @@
-try:
-    from dcard import api
-    from dcard.utils import Client
-except ImportError:
-    from . import api
-    from .utils import Client
+from __future__ import absolute_import
+
+from dcard import api
+from dcard.utils import Client
+
 
 client = Client()
 

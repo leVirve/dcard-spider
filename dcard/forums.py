@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals, absolute_import
 
 import logging
-try:
-    from dcard import api
-    from dcard.utils import Client
-except ImportError:
-    from . import api
-    from .utils import Client
+from dcard import api
+from dcard.utils import Client
 
 
 logger = logging.getLogger('dcard')
@@ -32,7 +29,7 @@ class Forum:
                 results += result
             else:
                 results.append(result)
-        logger.info(u'資訊蒐集完成，共%d筆' % len(results))
+        logger.info('資訊蒐集完成，共%d筆' % len(results))
         return results
 
     @staticmethod
@@ -44,7 +41,7 @@ class Forum:
 
     @staticmethod
     def get_post_metas(forum, pages, params):
-        logger.info(u'開始取得看板 [%s] 內文章資訊' % forum)
+        logger.info('開始取得看板 [%s] 內文章資訊' % forum)
         posts_meta_url = api.posts_meta_url_pattern.format(forum=forum)
         for _ in range(pages):
             data = Client.get(posts_meta_url, params=params)
@@ -52,5 +49,5 @@ class Forum:
                 params['before'] = data[-1]['id']
                 yield data
             except IndexError:
-                logger.warning(u'已到最末頁，第%d頁!' % _)
+                logger.warning('已到最末頁，第%d頁!' % _)
                 break

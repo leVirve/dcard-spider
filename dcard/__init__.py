@@ -1,8 +1,7 @@
+from __future__ import absolute_import
+
 import logging
-try:
-    from dcard.dcard import *
-except ImportError:
-    from .dcard import *
+from dcard.dcard import *
 
 
 logger = logging.getLogger('dcard')

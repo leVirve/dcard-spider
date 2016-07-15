@@ -1,12 +1,10 @@
+from __future__ import absolute_import
+
 import re
 import os
 from multiprocessing.dummy import Pool
-try:
-    from dcard.forums import Forum
-    from dcard.posts import Post
-except ImportError:
-    from .forums import Forum
-    from .posts import Post
+from dcard.forums import Forum
+from dcard.posts import Post
 
 
 __all__ = ['Dcard']
