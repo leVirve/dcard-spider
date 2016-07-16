@@ -142,7 +142,10 @@ class PostsResult:
         for bundle in bundles:
             post_id, folder, urls = bundle
             full_folder = 'downloads/%s (#%d)' % (folder, post_id)
-            os.makedirs(full_folder, exist_ok=True)
+
+            if not os.path.exists(full_folder):
+                os.makedirs(full_folder)
+
             tasks += [(url, full_folder) for url in urls]
 
         results = parallel_tasks(download, tasks)
