@@ -25,3 +25,27 @@ def test_multi_post_metas(forums):
     assert len(metas0) == 0
     assert 0 <= len(metas1) <= 30
     assert 0 <= len(metas) <= 90
+
+
+def test_multi_post_metas_with_callback(forums):
+
+    def collect_ids(metas):
+        return [meta['id'] for meta in metas]
+
+    def with_no_return(metas):
+        return None
+
+    def simulate_store_into_db(metas):
+        some_id = 987654
+        return some_id
+
+    forum = forums.get('test')['alias']
+
+    ids = Dcard.forums(forum).get_metas(callback=collect_ids)
+    none = Dcard.forums(forum).get_metas(callback=with_no_return)
+    rids = Dcard.forums(forum).get_metas(callback=simulate_store_into_db)
+
+    assert len(ids) != 0
+    assert len(rids) != 0
+    assert len(none) != 0
+    assert none == [None] * len(none)

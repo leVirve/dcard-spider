@@ -105,9 +105,11 @@ class PostsResult:
     def parse_resources(self, constraints=None):
 
         def validate(post):
-            _post = post['content']
-    
             ''' crazy impl. XD '''
+            if not constraints:
+                return True
+
+            _post = post['content']
             for key, rule in constraints.items():
                 expression = "_post['%s']%s" % (key, rule)
                 if eval(expression) is False:
@@ -119,6 +121,9 @@ class PostsResult:
             content = article['content']
             imgur_files = PostsResult.find_images(content)
             return (article['id'], article['title'], imgur_files)
+
+        if isinstance(self.results, dict):
+            return [parse(self.results)] if validate(self.results) else []
 
         resoures = [parse(post) for post in self.results if validate(post)]
         return resoures
