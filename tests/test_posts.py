@@ -8,7 +8,7 @@ from dcard import Dcard
 @pytest.fixture()
 def may_contain_resourse_post_ids():
     def contain_keyword(metas):
-        return [meta['id'] for meta in metas if '#' in meta['title']]
+        return [meta['id'] for meta in metas if '#圖' in meta['title']]
 
     return Dcard.forums('sex').get_metas(pages=1, callback=contain_keyword)
 
