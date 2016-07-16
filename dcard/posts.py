@@ -19,6 +19,10 @@ reg_imgur_file = re.compile('http[s]?://i.imgur.com/\w+\.(?:jpg|png|gif)')
 pattern_imgur_file = 'http://i.imgur.com/{img_hash}.jpg'
 
 
+def parallel_tasks(function, tasks):
+    return thread_pool.map_async(function, tasks)
+
+
 class Post:
 
     def __init__(self, metas):
@@ -66,10 +70,7 @@ class Post:
                 for post_id in self.ids
             ]
         if crawl_comments:
-            bundle['comments'] = [
-                Post.get_comments(post_id)
-                for post_id in self.ids
-            ]
+            bundle['comments_async'] = parallel_tasks(Post.get_comments, self.ids)
 
         return PostsResult(self.ids, bundle)
 
@@ -93,7 +94,8 @@ class PostsResult:
     def format(self, bundle):
         links = bundle.get('links_futures', [])
         content = bundle.get('content_futures', [])
-        comments = bundle.get('comments', [])
+        comments = bundle.get('comments_async')
+        comments = comments.get() if comments else []
 
         results = [
             {
@@ -143,5 +145,5 @@ class PostsResult:
             os.makedirs(full_folder, exist_ok=True)
             tasks += [(url, full_folder) for url in urls]
 
-        results = thread_pool.map_async(download, tasks)
+        results = parallel_tasks(download, tasks)
         return results.get()
