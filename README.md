@@ -2,6 +2,34 @@
 [![Build Status](https://travis-ci.org/leVirve/dcard-spider.svg?branch=master)](https://travis-ci.org/leVirve/dcard-spider)
 [![Coverage Status](https://coveralls.io/repos/github/leVirve/dcard-spider/badge.svg?branch=master)](https://coveralls.io/github/leVirve/dcard-spider?branch=master)
 
+# Sample
+## sample code
+
+```python
+from dcard import Dcard
+
+
+def 先過濾出標題含有作品關鍵字(metas):
+    return [meta['id'] for meta in metas if '#作品' in meta['title']]
+
+
+if __name__ == '__main__':
+
+    dcard = Dcard()
+
+    ids = dcard.forums('photography').get_metas(pages=3, callback=先過濾出標題含有作品關鍵字)
+    posts = dcard.posts(ids).get(comments=False, links=False)
+
+    resources = posts.parse_resources(constraints={'likeCount': '>=20'})
+
+    status = posts.download(resources)
+    print('成功下載！' if all(status) else '出了點錯下載不完全喔')
+```
+
+## 結果預覽
+![](/docs/img/snapshot.png)
+
+
 # Usage
 ## Basic
 
@@ -9,11 +37,6 @@
     - 可用參數`no_school`調整是否取得學校看版內容。
 
 ```python
-from dcard import Dcard
-
-
-dcard = Dcard()
-
 forums = dcard.forums.get()
 forums = dcard.forums.get(no_school=True)
 
