@@ -5,6 +5,7 @@ import os
 from multiprocessing.dummy import Pool
 from dcard.forums import Forum
 from dcard.posts import Post
+from dcard.utils import download
 
 
 __all__ = ['Dcard']
@@ -34,7 +35,7 @@ class Dcard:
             os.makedirs(full_folder, exist_ok=True)
             tasks += [(url, full_folder) for url in urls]
 
-        results = threadPool.map_async(download, tasks)
+        results = thread_pool.map_async(download, tasks)
         results.get()
 
     @staticmethod
