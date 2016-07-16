@@ -30,3 +30,4 @@ def download(task):
                 stream.write(chunk)
     else:
         print('%s can not download.' % src)
+    return response.ok

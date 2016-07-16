@@ -1,11 +1,22 @@
 from __future__ import absolute_import
 from six.moves import zip_longest
 
+import re
+import os
+from multiprocessing.dummy import Pool
+
 from dcard import api
-from dcard.utils import Client
+from dcard.utils import Client, download
 
 
 client = Client()
+thread_pool = Pool(processes=8)
+
+
+reg_images    = re.compile('http[s]?://\S+\.(?:jpg|png|gif)')
+reg_imgur     = re.compile('http[s]?://imgur.com/(\w+)')
+reg_imgur_file = re.compile('http[s]?://i.imgur.com/\w+\.(?:jpg|png|gif)')
+pattern_imgur_file = 'http://i.imgur.com/{img_hash}.jpg'
 
 
 class Post:
@@ -93,3 +104,44 @@ class PostsResult:
         ]
 
         return results[0] if len(results) == 1 else results
+
+    def parse_resources(self, constraints=None):
+
+        def validate(post):
+            _post = post['content']
+    
+            ''' crazy impl. XD '''
+            for key, rule in constraints.items():
+                expression = "_post['%s']%s" % (key, rule)
+                if eval(expression) is False:
+                    return False
+            return True
+
+        def parse(post):
+            article = post['content']
+            content = article['content']
+            imgur_files = PostsResult.find_images(content)
+            return (article['id'], article['title'], imgur_files)
+
+        resoures = [parse(post) for post in self.results if validate(post)]
+        return resoures
+
+    @staticmethod
+    def find_images(raw_data):
+        imgurs = reg_imgur.findall(raw_data)
+        imgur_files = reg_imgur_file.findall(raw_data)
+        imgur_files += [pattern_imgur_file.format(img_hash=r) for r in imgurs]
+        return imgur_files
+
+    @staticmethod
+    def download(bundles):
+        tasks = []
+
+        for bundle in bundles:
+            post_id, folder, urls = bundle
+            full_folder = 'downloads/%s (#%d)' % (folder, post_id)
+            os.makedirs(full_folder, exist_ok=True)
+            tasks += [(url, full_folder) for url in urls]
+
+        results = thread_pool.map_async(download, tasks)
+        return results.get()
