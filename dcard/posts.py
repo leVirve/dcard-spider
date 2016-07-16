@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+from six.moves import zip_longest
 
 from dcard import api
 from dcard.utils import Client
@@ -42,26 +43,53 @@ class Post:
         crawl_content  = kwargs.get('content', True)
         crawl_comments = kwargs.get('comments', True)
 
+        bundle = {}
         if crawl_links:
-            links_futures = [
+            bundle['links_futures'] = [
                 client.sget(api.post_links_url_pattern.format(post_id=post_id))
                 for post_id in self.ids
             ]
         if crawl_content:
-            content_futures = [
+            bundle['content_futures'] = [
                 client.sget(api.post_url_pattern.format(post_id=post_id))
                 for post_id in self.ids
             ]
-
-        results = [{} for _ in range(len(self.ids))]
-        if crawl_links:
-            for i, f in enumerate(links_futures):
-                results[i]['links'] = f.result().json()
-        if crawl_content:
-            for i, f in enumerate(content_futures):
-                results[i]['content'] = f.result().json()
         if crawl_comments:
-            for i, post_id in enumerate(self.ids):
-                results[i]['comments'] = Post.get_comments(post_id)
+            bundle['comments'] = [
+                Post.get_comments(post_id)
+                for post_id in self.ids
+            ]
+
+        return PostsResult(self.ids, bundle)
+
+
+class PostsResult:
+
+    def __init__(self, ids, bundle):
+        self.ids = ids
+        self.results = self.format(bundle)
+
+    def __len__(self):
+        return len(self.results)
+
+    def __getitem__(self, key):
+        ''' for single post result '''
+        return self.results[key]
+
+    def __iter__(self):
+        return self.results.__iter__()
+
+    def format(self, bundle):
+        links = bundle.get('links_futures', [])
+        content = bundle.get('content_futures', [])
+        comments = bundle.get('comments', [])
+
+        results = [
+            {
+                'links': lnks.result().json() if lnks else None,
+                'content': cont.result().json() if cont else None,
+                'comments': cmts,
+            } for lnks, cont, cmts in zip_longest(links, content, comments)
+        ]
 
         return results[0] if len(results) == 1 else results
