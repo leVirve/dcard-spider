@@ -52,24 +52,19 @@ class Post:
 
         return comments
 
-    def get(self, **kwargs):
-
-        crawl_links    = kwargs.get('links', True)
-        crawl_content  = kwargs.get('content', True)
-        crawl_comments = kwargs.get('comments', True)
-
+    def get(self, content=True, comments=True, links=True):
         bundle = {}
-        if crawl_links:
+        if links:
             bundle['links_futures'] = [
                 client.sget(api.post_links_url_pattern.format(post_id=post_id))
                 for post_id in self.ids
             ]
-        if crawl_content:
+        if content:
             bundle['content_futures'] = [
                 client.sget(api.post_url_pattern.format(post_id=post_id))
                 for post_id in self.ids
             ]
-        if crawl_comments:
+        if comments:
             bundle['comments_async'] = parallel_tasks(Post.get_comments, self.ids)
 
         return PostsResult(self.ids, bundle)
