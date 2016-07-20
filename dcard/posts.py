@@ -143,6 +143,9 @@ class PostsResult:
             post_id, folder, urls = bundle
             full_folder = 'downloads/%s (#%d)' % (folder, post_id)
 
+            if len(urls) == 0:
+                continue
+
             if not os.path.exists(full_folder):
                 os.makedirs(full_folder)
 
