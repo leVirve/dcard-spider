@@ -1,14 +1,26 @@
 dcard-spider
 ============
 
-|Build Status| |Coverage Status|
+|Build Status| |Coverage Status| |PyPI|
 
-Sample
-======
+Get posts and forums resourses through Dcard practical API on website.
 
-sample code
------------
+Feature
+-------
+Embrace asynchronous tasks and multithreads. All works done in parallel or coroutine-like.
+**Spider needs for speed.**
 
+Installation
+------------
+::
+    $ pip install dcard-spider
+
+Dependencies
+------------
+* Python 2.6+, Python 3.3+
+
+Example
+-------
 .. code:: python
 
     from dcard import Dcard
@@ -30,17 +42,15 @@ sample code
         status = posts.download(resources)
         print('成功下載！' if all(status) else '出了點錯下載不完全喔')
 
-結果預覽
---------
+Result
+.. image:: https://raw.githubusercontent.com/leVirve/dcard-spider/master/docs/img/snapshot.png
 
-.. figure:: https://raw.githubusercontent.com/leVirve/dcard-spider/master/docs/img/snapshot.png
-   :alt: 
 
 Usage
-=====
+-----
 
 Basic
------
+~~~~~
 
 -  取得看板資訊 (metadata)
 
@@ -91,7 +101,7 @@ Basic
     status = posts.download(resources)
 
 Advanced
---------
+~~~~~~~~
 
 -  提供自定義 callback function，可在接收回傳值前做處理 (filter / reduce
    data)。
@@ -119,6 +129,9 @@ Advanced
     posts = dcard.posts(ids).get(comments=False, links=False)
     print(len(posts))
 
+
+.. |PyPI| image:: https://img.shields.io/pypi/v/dcard-spider.svg
+    :target: https://pypi.python.org/pypi/dcard-spider
 .. |Build Status| image:: https://travis-ci.org/leVirve/dcard-spider.svg?branch=master
    :target: https://travis-ci.org/leVirve/dcard-spider
 .. |Coverage Status| image:: https://coveralls.io/repos/github/leVirve/dcard-spider/badge.svg?branch=master
