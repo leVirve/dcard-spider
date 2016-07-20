@@ -43,10 +43,11 @@ Example
         status = posts.download(resources)
         print('成功下載！' if all(status) else '出了點錯下載不完全喔')
 
-Result
-
-.. image:: https://raw.githubusercontent.com/leVirve/dcard-spider/master/docs/img/snapshot.png
-
+.. figure:: https://raw.githubusercontent.com/leVirve/dcard-spider/master/docs/img/snapshot.png
+    :width: 600px
+    :align: center
+    :alt: Demo result
+    :figclass: align-center
 
 Usage
 -----
