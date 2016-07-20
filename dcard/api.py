@@ -1,4 +1,4 @@
-API_ROOT = 'http://dcard.tw/_api'
+API_ROOT = 'https://dcard.tw/_api'
 FORUMS = 'forums'
 POSTS = 'posts'
 
