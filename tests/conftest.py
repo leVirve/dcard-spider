@@ -1,5 +1,13 @@
 import pytest
+
 from dcard import Dcard
+
+from tests.mocked import MockedRequest
+
+
+@pytest.fixture(autouse=True)
+def mock_all_requests(monkeypatch):
+    monkeypatch.setattr('requests.sessions.Session.request', MockedRequest.request)
 
 
 @pytest.fixture(scope='module')

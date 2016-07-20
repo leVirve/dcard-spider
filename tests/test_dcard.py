@@ -6,6 +6,7 @@ from dcard import Dcard
 def test_valid_api_forums(forums):
     all_forums = forums.get('all')
     assert all_forums is not None
+    assert isinstance(all_forums, list)
 
 
 def test_valid_api_forum(forums):
