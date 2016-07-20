@@ -33,7 +33,7 @@ sample code
 結果預覽
 --------
 
-.. figure:: /docs/img/snapshot.png
+.. figure:: https://raw.githubusercontent.com/leVirve/dcard-spider/master/docs/img/snapshot.png
    :alt: 
 
 Usage
