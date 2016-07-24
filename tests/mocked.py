@@ -6,11 +6,11 @@ import codecs
 class MockedRequest:
 
     mapping = [
-        (re.compile('forums$'), 'forums-all.json'),
+        (re.compile('forums$'), 'forums_all.json'),
         (re.compile('forums/\w+/posts$'), 'post_metas.json'),
-        (re.compile('posts/\d+$'), 'single_post.json'),
-        (re.compile('posts/\d+/links$'), 'single_post.json'),
-        (re.compile('posts/\d+/comments$'), 'single_post_single_comments.json'),
+        (re.compile('posts/\d+$'), 'single_post_content.json'),
+        (re.compile('posts/\d+/links$'), 'single_post_links.json'),
+        (re.compile('posts/\d+/comments$'), 'single_post_comments.json'),
     ]
 
     @staticmethod
@@ -25,13 +25,13 @@ class MockedRequest:
             regex, path = bundle
     
             if regex.search(url) is not None:
+                json = JsonResponse('./tests/data/' + path)
                 if i == 0 and kwargs.get('no_school'):
-                   path = 'forums.json'
-                elif i == 4 and params and params.get('after', 0) == 30:
-                    path = 'single_post_comments.json'
-                elif i == 4 and params and params.get('after', 0) > 30:
-                    return JsonResponse()
-                return JsonResponse('./tests/data/' + path)
+                    path = 'forums.json'
+                elif i == 4:
+                    json.comments_case = True
+                    json.start = params.get('after', 0) if params else 0
+                return json
 
 
 class JsonResponse:
@@ -39,12 +39,18 @@ class JsonResponse:
     def __init__(self, path=None, ok=True):
         self.f = codecs.open(path, 'r', 'utf-8') if path else path
         self.ok = ok
+        self.comments_case = False
 
     def result(self):
-        print('ffffffffffff')
         return self
 
     def json(self):
         result = json.load(self.f) if self.f else []
         self.f.close() if self.f else None
+
+        if self.comments_case:
+            start = self.start
+            end = start + 30 if start + 30 < len(result) else len(result) 
+            result = result[start:end]
+
         return result
