@@ -16,7 +16,6 @@ def may_contain_resourse_post_ids():
 def test_post_bundle(article_id):
     post = Dcard.posts(article_id).get()
     comment_count = post['content']['commentCount']
-    # assert False
     assert comment_count == len(post['comments'])
 
 
@@ -52,10 +51,10 @@ def test_parse_resourses_from_posts(may_contain_resourse_post_ids):
     assert len(resources) >= 0
 
 
-# def test_parse_resourses_from_post(may_contain_resourse_post_ids):
-#     posts = Dcard.posts(224341009).get(comments=False, links=False)
+def test_parse_resourses_from_post(may_contain_resourse_post_ids):
+    posts = Dcard.posts(224341009).get(comments=False, links=False)
 
-#     resources = posts.parse_resources()
-#     status = posts.download(resources)
+    resources = posts.parse_resources()
+    status = posts.download(resources)
 
-#     assert all(status)
+    assert all(status)

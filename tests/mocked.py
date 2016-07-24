@@ -20,6 +20,9 @@ class MockedRequest:
             (args[0] if isinstance(args[0], str) else args[2])
         params = kwargs.get('params')
 
+        if kwargs.get('stream'):
+            return StreamResponse('./tests/data/' + 'sample.jpg')
+
         for i, bundle in enumerate(MockedRequest.mapping):
 
             regex, path = bundle
@@ -54,3 +57,17 @@ class JsonResponse:
             result = result[start:end]
 
         return result
+
+
+class StreamResponse:
+
+    def __init__(self, path=None):
+        self.ok = True
+        self.f = open(path, 'rb')
+
+    def iter_content(self, chunk_size):
+        while True:
+            data = self.f.read(chunk_size)
+            if not data:
+                break
+            yield data
