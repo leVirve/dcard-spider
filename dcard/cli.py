@@ -3,23 +3,19 @@ import argparse
 
 from dcard.dcard import Dcard
 
-
-
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "mode", help="download / meta mode")
+parser.add_argument(
+    "-f", "--forum", help="Specific which forum")
+parser.add_argument(
+    "-p", "--pages", type=int, help="Crawl how many pages")
+parser.add_argument(
+    "-likes", "--likes_threshold", type=int, help="Specific minimum like counts")
 
 
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "mode", help="download / meta mode")
-    parser.add_argument(
-        "-f", "--forum", help="Specific which forum")
-    parser.add_argument(
-        "-p", "--pages", type=int, help="Crawl how many pages")
-    parser.add_argument(
-        "-likes", "--likes_threshold", type=int, help="Specific minimum like counts")
-
     args = parser.parse_args()
-
     if args.mode == 'download':
         if not (args.forum or args.pages):
             parser.error('No action requested, add --forum or --pages')
@@ -49,3 +45,5 @@ def download(args):
 
     print('成功下載！' if all(status) else '出了點錯下載不完全喔')
     print('Finish in {:.5f} sec(s).'.format(time.time() - start_time))
+
+    return all(status)
