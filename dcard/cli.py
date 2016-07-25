@@ -12,7 +12,7 @@ parser.add_argument(
 parser.add_argument(
     "-f", "--forum", help="Specific which forum")
 parser.add_argument(
-    "-p", "--pages", type=int, help="Crawl how many pages")
+    "-n", "--number", type=int, help="Scan through how many posts")
 parser.add_argument(
     "-likes", "--likes_threshold", type=int, help="Specific minimum like counts")
 
@@ -42,7 +42,7 @@ def download(args):
 
     ids = dcard \
         .forums(args.forum) \
-        .get_metas(pages=args.pages, callback=collect_ids)
+        .get_metas(num=args.number, callback=collect_ids)
     posts = dcard.posts(ids).get(comments=False, links=False)
     resources = posts.parse_resources()
     status = posts.download(resources)

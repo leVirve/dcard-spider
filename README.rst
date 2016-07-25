@@ -35,7 +35,7 @@ Example
 
         dcard = Dcard()
 
-        ids = dcard.forums('photography').get_metas(pages=3, callback=先過濾出標題含有作品關鍵字)
+        ids = dcard.forums('photography').get_metas(num=100, callback=先過濾出標題含有作品關鍵字)
         posts = dcard.posts(ids).get(comments=False, links=False)
 
         resources = posts.parse_resources(constraints={'likeCount': '>=20'})
@@ -53,7 +53,7 @@ Command line
 ------------
 ::
 
-    dcard download -f [forums name] -p [pages] (optional: -likes [likes threshold])
+    dcard download -f [forums name] -n [number of posts] (optional: -likes [likes threshold])
 
 
 Usage
@@ -73,13 +73,13 @@ Basic
 
 -  取得看板文章資訊 (metadata)，一頁有30篇文章
 
-   -  可用 ``pages`` 指定頁數數量
+   -  可用 ``num`` 指定文章數量
    -  文章排序有兩種選擇: ``new`` / ``popular``
 
 .. code:: python
 
-    ariticle_metas = dcard.forums('funny').get_metas(pages=5, sort='new')
-    ariticle_metas = dcard.forums('funny').get_metas(pages=1, sort='popular')
+    ariticle_metas = dcard.forums('funny').get_metas(num=150, sort='new')
+    ariticle_metas = dcard.forums('funny').get_metas(num=30, sort='popular')
 
 -  提供一次取得 單篇/多篇 文章詳細資訊(全文、引用連結、所有留言)
 
@@ -98,9 +98,9 @@ Basic
 
 -  下載文章中的資源 (目前支援文中 imgur 連結的圖片)
 
-  -  可加入限制 (constraints) 過濾出符合條件的文章後，再進行分析
-  -  可以使用多個限制條件
-  -  預設每篇圖片儲存至 ``文章標題 (#文章編號)`` 為名的新資料夾
+   -  可加入限制 (constraints) 過濾出符合條件的文章後，再進行分析
+   -  可以使用多個限制條件
+   -  預設每篇圖片儲存至 ``文章標題 (#文章編號)`` 為名的新資料夾
 
 .. code:: python
 
@@ -125,8 +125,8 @@ Advanced
         return [meta['id'] for meta in metas if '#圖' in meta['title']]
 
 
-    ids = dcard.forums('funny').get_metas(pages=5, callback=collect_ids)
-    ids = dcard.forums('funny').get_metas(pages=5, callback=標題含有圖片關鍵字)
+    ids = dcard.forums('funny').get_metas(num=50, callback=collect_ids)
+    ids = dcard.forums('funny').get_metas(num=50, callback=標題含有圖片關鍵字)
 
 -  爬取文章時提供 content, links, comments
    三個參數，能選擇略過不需要的資訊以加快爬蟲速度。

@@ -11,20 +11,19 @@ def test_post_metas(forums):
     forum = forums.get('test')['alias']
     pop_metas = Dcard.forums(forum).get_metas(sort='popular')
     new_metas = Dcard.forums(forum).get_metas(sort='new')
-    assert 0 <= len(pop_metas) <= 30
-    assert 0 <= len(new_metas) <= 30
-    assert len(pop_metas) <= len(new_metas) == 30
+    assert len(pop_metas) == 30
+    assert len(new_metas) == 30
 
 
 def test_multi_post_metas(forums):
     forum = forums.get('test')['alias']
-    metas0 = Dcard.forums(forum).get_metas(pages=0)
+    metas0 = Dcard.forums(forum).get_metas(num=0)
     metas1 = Dcard.forums(forum).get_metas()
-    metas = Dcard.forums(forum).get_metas(pages=3)
+    metas = Dcard.forums(forum).get_metas(num=90)
 
     assert len(metas0) == 0
-    assert 0 <= len(metas1) <= 30
-    assert 0 <= len(metas) <= 90
+    assert len(metas1) == 30
+    assert len(metas) == 90
 
 
 def test_multi_post_metas_with_callback(forums):

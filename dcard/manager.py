@@ -12,7 +12,6 @@ reg_imgur_file = re.compile('http[s]?://i.imgur.com/\w+\.(?:jpg|png|gif)')
 pattern_imgur_file = 'http://i.imgur.com/{img_hash}.jpg'
 
 
-
 def download(task):
     filepath, src = task
     if os.path.exists(filepath):

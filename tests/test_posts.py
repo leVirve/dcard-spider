@@ -10,7 +10,7 @@ def may_contain_resourse_post_ids():
     def contain_keyword(metas):
         return [meta['id'] for meta in metas if '#圖' in meta['title']]
 
-    return Dcard.forums('sex').get_metas(pages=1, callback=contain_keyword)
+    return Dcard.forums('sex').get_metas(num=10, callback=contain_keyword)
 
 
 def test_post_bundle(article_id):
@@ -22,7 +22,7 @@ def test_post_bundle(article_id):
 def test_post_bundles(forums):
     forum = forums.get('test')['alias']
 
-    metas = Dcard.forums(forum).get_metas(pages=1)
+    metas = Dcard.forums(forum).get_metas(num=10)
     ids   = [m['id'] for m in metas]
 
     posts1 = Dcard.posts(metas).get(comments=False, links=False)

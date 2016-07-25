@@ -12,6 +12,8 @@ logger = logging.getLogger('dcard')
 
 class Forum:
 
+    metas_per_page = 30
+
     def __init__(self, forum):
         self.forum = forum
         self.posts_meta_url = api.posts_meta_url_pattern.format(forum=forum)
@@ -23,16 +25,18 @@ class Forum:
             return [forum for forum in Forum._extract_general(forums)]
         return forums
 
-    def get_metas(self, pages=1, sort='new', callback=None):
+    def get_metas(self, num=30, sort='new', callback=None):
         logger.info('開始取得看板 [%s] 內文章資訊' % self.forum)
 
+        pages = num // Forum.metas_per_page
         results = [
             callback(metas) if callback else metas
-            for metas in self._get_metas(pages, sort)
+            for metas in self._get_metas(pages + 1, sort)
         ]
 
         if len(results) and isinstance(results[0], list):
             results = Forum._flatten_result_lists(results)
+            results = results[:num]
 
         logger.info('資訊蒐集完成，共%d筆' % len(results))
         return results
