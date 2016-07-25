@@ -38,7 +38,7 @@ Example
         ids = dcard.forums('photography').get_metas(num=100, callback=先過濾出標題含有作品關鍵字)
         posts = dcard.posts(ids).get(comments=False, links=False)
 
-        resources = posts.parse_resources(constraints={'likeCount': '>=20'})
+        resources = posts.parse_resources()
 
         status = posts.download(resources)
         print('成功下載！' if all(status) else '出了點錯下載不完全喔')
@@ -97,17 +97,14 @@ Basic
     articles = dcard.posts(ariticle_metas).get()
 
 -  下載文章中的資源 (目前支援文中 imgur 連結的圖片)
-
-   -  可加入限制 (constraints) 過濾出符合條件的文章後，再進行分析
-   -  可以使用多個限制條件
-   -  預設每篇圖片儲存至 ``文章標題 (#文章編號)`` 為名的新資料夾
+   -  預設每篇圖片儲存至 `(#文章編號) 文章標題` 為名的新資料夾
+   -  `.download()` 會回傳每個資源下載成功與否
 
 .. code:: python
 
-    resources = articles.parse_resources(constraints={'likeCount': '>=100')
-    resources = articles.parse_resources(constraints={'likeCount': '>=20', 'commentCount': '>10'})
-
+    resources = articles.parse_resources()
     status = articles.download(resources)
+
 
 Advanced
 ~~~~~~~~
@@ -119,6 +116,10 @@ Advanced
 
     def collect_ids(metas):
         return [meta['id'] for meta in metas]
+
+
+    def likes_count_greater(metas):
+        return [meta['id'] for meta in metas if meta['likeCount'] >= 20]
 
 
     def 標題含有圖片關鍵字(metas):
@@ -134,6 +135,34 @@ Advanced
 .. code:: python
 
     posts = dcard.posts(ids).get(comments=False, links=False)
+
+-  class `Posts` 下的 `downloader` 提供 hacking 選項
+   - `subfolder_pattern` 可自定義子資料夾命名規則
+   - `flatten` 選項可選擇將所有資源(圖片)放在一層資料夾下，而不要按照文章分子資料夾
+
+.. code:: python
+
+    articles.downloader.subfolder_pattern = '[{likeCount}推] {id}-{folder_name}'
+    articles.downloader.flatten = True
+
+
+What's next
+-----------
+This will be a library project for dcard continously crawling spider. And also provides end-user friendly features.
+
+
+Licence
+-------
+
+**MIT**
+
+
+Inspirations
+------------
+`SLMT's <https://github.com/SLMT>`_
+`dcard-crawler <https://github.com/SLMT/dcard-crawler>`_
+
+`Aragorn's <https://github.com/LordElessar>`_ downloader funtional request
 
 
 .. |PyPI| image:: https://img.shields.io/pypi/v/dcard-spider.svg

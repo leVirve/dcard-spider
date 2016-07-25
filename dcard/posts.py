@@ -85,8 +85,8 @@ class PostsResult:
 
         return results[0] if len(results) == 1 else results
 
-    def parse_resources(self, constraints=None):
-        parser = ContentParser(self.results, constraints)
+    def parse_resources(self):
+        parser = ContentParser(self.results)
         return parser.parse()
 
     def download(self, resource_bundles):

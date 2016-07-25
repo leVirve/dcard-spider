@@ -76,23 +76,10 @@ class Downloader:
 
 class ContentParser:
 
-    def __init__(self, results, constraints):
+    def __init__(self, results):
         self.results = results
-        self.constraints = constraints
 
     def parse(self):
-
-        def validate(post):
-            ''' crazy impl. XD '''
-            if not self.constraints:
-                return True
-
-            _post = post['content']
-            for key, rule in self.constraints.items():
-                expression = "_post['%s']%s" % (key, rule)
-                if eval(expression) is False:
-                    return False
-            return True
 
         def parse(post):
             article = post['content']
@@ -102,9 +89,9 @@ class ContentParser:
             return (article, imgur_files)
 
         if isinstance(self.results, dict):
-            return [parse(self.results)] if validate(self.results) else []
+            return [parse(self.results)]
 
-        resoures = [parse(post) for post in self.results if validate(post)]
+        resoures = [parse(post) for post in self.results]
         return resoures
 
     @staticmethod

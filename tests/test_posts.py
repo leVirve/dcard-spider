@@ -46,7 +46,7 @@ def test_parse_resourses_from_posts(may_contain_resourse_post_ids):
     ids = may_contain_resourse_post_ids
 
     posts = Dcard.posts(ids).get(comments=False, links=False)
-    resources = posts.parse_resources(constraints={'commentCount': '>5'})
+    resources = posts.parse_resources()
 
     assert len(resources) >= 0
 
