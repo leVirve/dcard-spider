@@ -14,7 +14,8 @@ def may_contain_resourse_post_ids():
 
 
 def test_post_bundle(article_id):
-    post = Dcard.posts(article_id).get()
+    posts = Dcard.posts(article_id).get()
+    post = posts[0]
     comment_count = post['content']['commentCount']
     assert comment_count == len(post['comments'])
 

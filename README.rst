@@ -81,16 +81,16 @@ Basic
     ariticle_metas = dcard.forums('funny').get_metas(num=150, sort='new')
     ariticle_metas = dcard.forums('funny').get_metas(num=30, sort='popular')
 
--  提供一次取得 單篇/多篇 文章詳細資訊(全文、引用連結、所有留言)
+-  提供一次取得多篇文章詳細資訊(全文、引用連結、所有留言)
 
 .. code:: python
 
-    # 放入 文章編號/單一meta資訊 => return 單篇文章
+    # 可放入 文章編號/單一meta資訊 => return 單篇文章 in list
 
     article = dcard.posts(224341009).get()
     article = dcard.posts(ariticle_metas[0]).get()
 
-    # 放入 複數文章編號/多個meta資訊 => return 一串文章
+    # 放入 複數文章編號/多個meta資訊 => return 多篇文章 in list
 
     ids = [meta['id'] for meta in ariticle_metas]
     articles = dcard.posts(ids).get()
