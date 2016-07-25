@@ -1,26 +1,9 @@
 from __future__ import absolute_import
 from six.moves import zip_longest
 
-import re
-import os
-from multiprocessing.dummy import Pool
-
 from dcard import api
-from dcard.utils import Client, download
-
-
-client = Client()
-thread_pool = Pool(processes=8)
-
-
-reg_images    = re.compile('http[s]?://\S+\.(?:jpg|png|gif)')
-reg_imgur     = re.compile('http[s]?://imgur.com/(\w+)')
-reg_imgur_file = re.compile('http[s]?://i.imgur.com/\w+\.(?:jpg|png|gif)')
-pattern_imgur_file = 'http://i.imgur.com/{img_hash}.jpg'
-
-
-def parallel_tasks(function, tasks):
-    return thread_pool.map_async(function, tasks)
+from dcard.manager import ContentParser, Downloader
+from dcard.utils import client
 
 
 class Post:
@@ -49,7 +32,7 @@ class Post:
             ]
         if comments:
             bundle['comments_async'] = \
-                parallel_tasks(Post._get_comments, self.ids)
+                client.parallel_tasks(Post._get_comments, self.ids)
 
         return PostsResult(self.ids, bundle)
 
@@ -60,7 +43,7 @@ class Post:
         params = {}
         comments = []
         while True:
-            _comments = Client.get(comments_url, params=params)
+            _comments = client.get(comments_url, params=params)
             if len(_comments) == 0:
                 break
             comments += _comments
@@ -71,10 +54,9 @@ class Post:
 
 class PostsResult:
 
-    def __init__(self, ids, bundle, download_folder=None):
+    def __init__(self, ids, bundle):
         self.ids = ids
         self.results = self.format(bundle)
-        self.resources_folder = download_folder or './downloads'
 
     def __len__(self):
         return len(self.results)
@@ -103,60 +85,9 @@ class PostsResult:
         return results[0] if len(results) == 1 else results
 
     def parse_resources(self, constraints=None):
-
-        def validate(post):
-            ''' crazy impl. XD '''
-            if not constraints:
-                return True
-
-            _post = post['content']
-            for key, rule in constraints.items():
-                expression = "_post['%s']%s" % (key, rule)
-                if eval(expression) is False:
-                    return False
-            return True
-
-        def parse(post):
-            article = post['content']
-            content = article['content']
-            imgur_files = PostsResult.find_images(content)
-            return ((article['id'], article['title']), imgur_files)
-
-        if isinstance(self.results, dict):
-            return [parse(self.results)] if validate(self.results) else []
-
-        resoures = [parse(post) for post in self.results if validate(post)]
-        return resoures
-
-    @staticmethod
-    def find_images(raw_data):
-        imgurs = reg_imgur.findall(raw_data)
-        imgur_files = reg_imgur_file.findall(raw_data)
-        imgur_files += [pattern_imgur_file.format(img_hash=r) for r in imgurs]
-        return imgur_files
+        parser = ContentParser(self.results, constraints)
+        return parser.parse()
 
     def download(self, resource_bundles):
-
-        def gen_full_folder(meta):            
-            post_id, post_title = meta
-            safe_title = re.sub('\?\\/><:"|\*', '', post_title)
-            folder = '({id}) {folder_name}'.format(
-                id=post_id, folder_name=safe_title
-            )
-            return os.path.join(self.resources_folder, folder)
-
-        def mkdir(path):
-            if not os.path.exists(path):
-                os.makedirs(path)
-
-        tasks = []
-        for bundle in resource_bundles:
-            meta, urls = bundle
-            if len(urls) == 0:
-                continue
-            folder = gen_full_folder(meta)
-            tasks += [(url, folder) for url in urls]
-            mkdir(folder)
-
-        results = parallel_tasks(download, tasks)
-        return results.get()
+        downloader = Downloader(resource_bundles)
+        return downloader.download()
