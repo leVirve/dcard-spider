@@ -33,9 +33,13 @@ def download(task):
 
 class Downloader:
 
-    def __init__(self, resource_bundles, download_folder=None):
-        self.resource_bundles = resource_bundles
+    def __init__(self, download_folder=None, subfolder_pattern=None):
         self.resources_folder = download_folder or './downloads'
+        self.subfolder_pattern = subfolder_pattern or '({id}) {folder_name}'
+        self.done_resources = 0
+
+    def set_bundles(self, resource_bundles):
+        self.resource_bundles = resource_bundles
 
     def download(self):
         tasks = []
@@ -43,6 +47,7 @@ class Downloader:
             meta, urls = bundle
             if len(urls) == 0:
                 continue
+            self.done_resources += len(urls)
             folder = self.gen_full_folder(meta)
             tasks += [(url, folder) for url in urls]
             Downloader.mkdir(folder)
@@ -50,11 +55,10 @@ class Downloader:
         results = client.parallel_tasks(download, tasks)
         return results.get()
 
-    def gen_full_folder(self, meta):            
-        post_id, post_title = meta
-        safe_title = re.sub('[\?\\/><:"|\*.]', '', post_title).strip()
-        folder = '({id}) {folder_name}'.format(
-            id=post_id, folder_name=safe_title
+    def gen_full_folder(self, meta):
+        safe_title = re.sub('[\?\\/><:"|\*.]', '', meta['title']).strip()
+        folder = self.subfolder_pattern.format(
+            **meta, folder_name=safe_title
         )
         return self.resources_folder + '/' + folder
 
@@ -88,7 +92,8 @@ class ContentParser:
             article = post['content']
             content = article['content']
             imgur_files = ContentParser._parse_images(content)
-            return ((article['id'], article['title']), imgur_files)
+            del article['content']
+            return (article, imgur_files)
 
         if isinstance(self.results, dict):
             return [parse(self.results)] if validate(self.results) else []

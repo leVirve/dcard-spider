@@ -57,6 +57,7 @@ class PostsResult:
     def __init__(self, ids, bundle):
         self.ids = ids
         self.results = self.format(bundle)
+        self.downloader = Downloader()
 
     def __len__(self):
         return len(self.results)
@@ -89,5 +90,5 @@ class PostsResult:
         return parser.parse()
 
     def download(self, resource_bundles):
-        downloader = Downloader(resource_bundles)
-        return downloader.download()
+        self.downloader.set_bundles(resource_bundles)
+        return self.downloader.download()
