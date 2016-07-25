@@ -97,6 +97,7 @@ Basic
     articles = dcard.posts(ariticle_metas).get()
 
 -  下載文章中的資源 (目前支援文中 imgur 連結的圖片)
+
    -  預設每篇圖片儲存至 `(#文章編號) 文章標題` 為名的新資料夾
    -  `.download()` 會回傳每個資源下載成功與否
 
@@ -137,6 +138,7 @@ Advanced
     posts = dcard.posts(ids).get(comments=False, links=False)
 
 -  class `Posts` 下的 `downloader` 提供 hacking 選項
+
    - `subfolder_pattern` 可自定義子資料夾命名規則
    - `flatten` 選項可選擇將所有資源(圖片)放在一層資料夾下，而不要按照文章分子資料夾
 

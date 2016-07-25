@@ -5,7 +5,7 @@ import logging
 import itertools
 
 from dcard import api
-from dcard.utils import Client
+from dcard.utils import client
 
 logger = logging.getLogger('dcard')
 
@@ -20,7 +20,7 @@ class Forum:
 
     @staticmethod
     def get(no_school=False):
-        forums = Client.get(api.forums_url)
+        forums = client.get(api.forums_url)
         if no_school:
             return [forum for forum in Forum._extract_general(forums)]
         return forums
@@ -29,10 +29,14 @@ class Forum:
         logger.info('開始取得看板 [%s] 內文章資訊' % self.forum)
 
         pages = num // Forum.metas_per_page
-        results = [
-            callback(metas) if callback else metas
-            for metas in self._get_metas(pages + 1, sort)
-        ]
+        if num % Forum.metas_per_page != 0:
+            pages += 1
+
+        results = []
+        for i, metas in enumerate(self._get_metas(pages, sort)):
+            if (i + 1) * Forum.metas_per_page > num:
+                metas = metas[:num - i * Forum.metas_per_page]
+            results.append(callback(metas) if callback else metas)
 
         if len(results) and isinstance(results[0], list):
             results = Forum._flatten_result_lists(results)
@@ -44,7 +48,7 @@ class Forum:
     def _get_metas(self, pages, sort):
         params = {'popular': False} if sort == 'new' else {}
         for _ in range(pages):
-            data = Client.get(self.posts_meta_url, params=params)
+            data = client.get(self.posts_meta_url, params=params)
             try:
                 params['before'] = data[-1]['id']
                 yield data

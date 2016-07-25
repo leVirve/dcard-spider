@@ -62,12 +62,11 @@ class PostsResult:
     def __len__(self):
         return len(self.results)
 
-    def __getitem__(self, key):
-        ''' for single post result '''
-        return self.results[key]
-
     def __iter__(self):
         return self.results.__iter__()
+
+    def __getitem__(self, key):
+        return self.results[int(key)]
 
     def format(self, bundle):
         links = bundle.get('links_futures', [])
@@ -82,8 +81,7 @@ class PostsResult:
                 'comments': cmts,
             } for lnks, cont, cmts in zip_longest(links, content, comments)
         ]
-
-        return results[0] if len(results) == 1 else results
+        return results
 
     def parse_resources(self):
         parser = ContentParser(self.results)
