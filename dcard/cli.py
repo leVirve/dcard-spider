@@ -30,7 +30,8 @@ def download(args):
     def collect_ids(metas):
         return [meta['id'] for meta in metas if meta['likeCount'] >= likes_thesh]
 
-    likes_thesh = args.likes_threshold
+    if args.likes_threshold:
+        likes_thesh = args.likes_threshold
 
     dcard = Dcard()
 
@@ -43,7 +44,8 @@ def download(args):
     resources = posts.parse_resources()
     status = posts.download(resources)
 
-    print('成功下載！' if all(status) else '出了點錯下載不完全喔')
+    print('成功下載 %d items！' % len(resources) \ 
+          if all(status) else '出了點錯下載不完全喔')
     print('Finish in {:.5f} sec(s).'.format(time.time() - start_time))
 
     return all(status)

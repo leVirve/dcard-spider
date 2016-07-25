@@ -141,6 +141,7 @@ class PostsResult:
 
         for bundle in bundles:
             post_id, folder, urls = bundle
+            folder = re.sub('\?', '', folder)  # might need more protect
             full_folder = 'downloads/%s (#%d)' % (folder, post_id)
 
             if len(urls) == 0:
