@@ -26,31 +26,14 @@ def parallel_tasks(function, tasks):
 class Post:
 
     def __init__(self, metas):
-        '''
-        :params `metas`: list of article_metas/ids, or one article_meta/id,
-                        article_meta must contain `id` field
-        '''
         if isinstance(metas, list):
             first = metas[0]
-            ids = [meta['id'] for meta in metas] if isinstance(first, dict) else metas
+            ids = [meta['id'] for meta in metas] if isinstance(first, dict) \
+                else metas
         else:
-            ids = [metas['id']] if isinstance(metas, dict) else [metas]
+            ids = [metas['id']] if isinstance(metas, dict) \
+                else [metas]
         self.ids = ids
-
-    @staticmethod
-    def get_comments(post_id):
-        comments_url = api.post_comments_url_pattern.format(post_id=post_id)
-
-        params = {}
-        comments = []
-        while True:
-            _comments = Client.get(comments_url, params=params)
-            if len(_comments) == 0:
-                break
-            comments += _comments
-            params['after'] = _comments[-1]['floor']
-
-        return comments
 
     def get(self, content=True, comments=True, links=True):
         bundle = {}
@@ -65,16 +48,33 @@ class Post:
                 for post_id in self.ids
             ]
         if comments:
-            bundle['comments_async'] = parallel_tasks(Post.get_comments, self.ids)
+            bundle['comments_async'] = \
+                parallel_tasks(Post._get_comments, self.ids)
 
         return PostsResult(self.ids, bundle)
+
+    @staticmethod
+    def _get_comments(post_id):
+        comments_url = api.post_comments_url_pattern.format(post_id=post_id)
+
+        params = {}
+        comments = []
+        while True:
+            _comments = Client.get(comments_url, params=params)
+            if len(_comments) == 0:
+                break
+            comments += _comments
+            params['after'] = _comments[-1]['floor']
+
+        return comments
 
 
 class PostsResult:
 
-    def __init__(self, ids, bundle):
+    def __init__(self, ids, bundle, download_folder=None):
         self.ids = ids
         self.results = self.format(bundle)
+        self.resources_folder = download_folder or './downloads'
 
     def __len__(self):
         return len(self.results)
@@ -120,7 +120,7 @@ class PostsResult:
             article = post['content']
             content = article['content']
             imgur_files = PostsResult.find_images(content)
-            return (article['id'], article['title'], imgur_files)
+            return ((article['id'], article['title']), imgur_files)
 
         if isinstance(self.results, dict):
             return [parse(self.results)] if validate(self.results) else []
@@ -135,22 +135,28 @@ class PostsResult:
         imgur_files += [pattern_imgur_file.format(img_hash=r) for r in imgurs]
         return imgur_files
 
-    @staticmethod
-    def download(bundles):
+    def download(self, resource_bundles):
+
+        def gen_full_folder(meta):            
+            post_id, post_title = meta
+            safe_title = re.sub('\?\\/><:"|\*', '', post_title)
+            folder = '({id}) {folder_name}'.format(
+                id=post_id, folder_name=safe_title
+            )
+            return os.path.join(self.resources_folder, folder)
+
+        def mkdir(path):
+            if not os.path.exists(path):
+                os.makedirs(path)
+
         tasks = []
-
-        for bundle in bundles:
-            post_id, folder, urls = bundle
-            folder = re.sub('\?', '', folder)  # might need more protect
-            full_folder = 'downloads/%s (#%d)' % (folder, post_id)
-
+        for bundle in resource_bundles:
+            meta, urls = bundle
             if len(urls) == 0:
                 continue
-
-            if not os.path.exists(full_folder):
-                os.makedirs(full_folder)
-
-            tasks += [(url, full_folder) for url in urls]
+            folder = gen_full_folder(meta)
+            tasks += [(url, folder) for url in urls]
+            mkdir(folder)
 
         results = parallel_tasks(download, tasks)
         return results.get()
