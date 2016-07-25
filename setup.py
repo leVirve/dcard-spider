@@ -17,7 +17,6 @@ setup(
     platforms='any',
     packages=['dcard'],
     zip_safe=False,
-    scripts=['spider.py'],
     keywords='Dcard crawler spider',
     entry_points = {
         'console_scripts': ['dcard=dcard.cli:main'],
