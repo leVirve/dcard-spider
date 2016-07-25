@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 import time
 import argparse
 
@@ -44,8 +47,8 @@ def download(args):
     resources = posts.parse_resources()
     status = posts.download(resources)
 
-    print('成功下載 %d items！' % len(resources) \ 
-          if all(status) else '出了點錯下載不完全喔')
+    print('成功下載 %d items！' % len(resources) if all(status)  \
+            else '出了點錯下載不完全喔')
     print('Finish in {:.5f} sec(s).'.format(time.time() - start_time))
 
     return all(status)
