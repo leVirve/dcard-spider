@@ -52,11 +52,11 @@ class Downloader:
 
     def gen_full_folder(self, meta):            
         post_id, post_title = meta
-        safe_title = re.sub('\?\\/><:"|\*', '', post_title)
+        safe_title = re.sub('[\?\\/><:"|\*.]', '', post_title).strip()
         folder = '({id}) {folder_name}'.format(
             id=post_id, folder_name=safe_title
         )
-        return os.path.join(self.resources_folder, folder)
+        return self.resources_folder + '/' + folder
 
     @staticmethod
     def mkdir(path):
