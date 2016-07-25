@@ -49,6 +49,13 @@ Example
     :alt: Demo result
     :figclass: align-center
 
+Command line
+------------
+::
+
+    dcard download -f [forums name] -p [pages] (optional: -likes [likes threshold])
+
+
 Usage
 -----
 
@@ -64,8 +71,6 @@ Basic
     forums = dcard.forums.get()
     forums = dcard.forums.get(no_school=True)
 
-    print(len(forums))
-
 -  取得看板文章資訊 (metadata)，一頁有30篇文章
 
    -  可用 ``pages`` 指定頁數數量
@@ -76,17 +81,17 @@ Basic
     ariticle_metas = dcard.forums('funny').get_metas(pages=5, sort='new')
     ariticle_metas = dcard.forums('funny').get_metas(pages=1, sort='popular')
 
-    print(len(ariticle_metas))
-
 -  提供一次取得 單篇/多篇 文章詳細資訊(全文、引用連結、所有留言)
 
 .. code:: python
 
     # 放入 文章編號/單一meta資訊 => return 單篇文章
+
     article = dcard.posts(224341009).get()
     article = dcard.posts(ariticle_metas[0]).get()
 
     # 放入 複數文章編號/多個meta資訊 => return 一串文章
+
     ids = [meta['id'] for meta in ariticle_metas]
     articles = dcard.posts(ids).get()
     articles = dcard.posts(ariticle_metas).get()
@@ -98,10 +103,10 @@ Basic
 
 .. code:: python
 
-    resources = posts.parse_resources(constraints={'likeCount': '>=100')
-    resources = posts.parse_resources(constraints={'likeCount': '>=20', 'commentCount': '>10'})
+    resources = articles.parse_resources(constraints={'likeCount': '>=100')
+    resources = articles.parse_resources(constraints={'likeCount': '>=20', 'commentCount': '>10'})
 
-    status = posts.download(resources)
+    status = articles.download(resources)
 
 Advanced
 ~~~~~~~~
@@ -122,15 +127,12 @@ Advanced
     ids = dcard.forums('funny').get_metas(pages=5, callback=collect_ids)
     ids = dcard.forums('funny').get_metas(pages=5, callback=標題含有圖片關鍵字)
 
-    print(len(ids))
-
 -  爬取文章時提供 content, links, comments
    三個參數，能選擇略過不需要的資訊以加快爬蟲速度。
 
 .. code:: python
 
     posts = dcard.posts(ids).get(comments=False, links=False)
-    print(len(posts))
 
 
 .. |PyPI| image:: https://img.shields.io/pypi/v/dcard-spider.svg
