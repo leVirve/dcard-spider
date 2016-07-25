@@ -14,11 +14,7 @@ pattern_imgur_file = 'http://i.imgur.com/{img_hash}.jpg'
 
 
 def download(task):
-    src, folder = task
-    filepath = '{folder_name}/{file_name}'.format(
-        folder_name=folder,
-        file_name=os.path.basename(src)
-    )
+    filepath, src = task
     if os.path.exists(filepath):
         return True
     response = client.get_stream(src)
@@ -33,10 +29,13 @@ def download(task):
 
 class Downloader:
 
-    def __init__(self, download_folder=None, subfolder_pattern=None):
+    def __init__(self,
+        download_folder=None, subfolder_pattern=None, flatten=False):
         self.resources_folder = download_folder or './downloads'
         self.subfolder_pattern = subfolder_pattern or '({id}) {folder_name}'
         self.done_resources = 0
+        self.flatten = flatten
+        Downloader.mkdir(self.resources_folder)
 
     def set_bundles(self, resource_bundles):
         self.resource_bundles = resource_bundles
@@ -48,18 +47,26 @@ class Downloader:
             if len(urls) == 0:
                 continue
             self.done_resources += len(urls)
-            folder = self.gen_full_folder(meta)
-            tasks += [(url, folder) for url in urls]
-            Downloader.mkdir(folder)
+            tasks += [(self._gen_filepath(meta, url), url) for url in urls]
 
         results = client.parallel_tasks(download, tasks)
         return results.get()
 
-    def gen_full_folder(self, meta):
-        safe_title = re.sub('[\?\\/><:"|\*.]', '', meta['title']).strip()
-        folder = self.subfolder_pattern.format(
-            **meta, folder_name=safe_title
+    def _gen_filepath(self, meta, url):
+        folder = self._gen_full_folder(meta)
+        base_name = os.path.basename(url)
+        filepath = '{folder_name}{separator}{file_name}'.format(
+            folder_name=folder,
+            file_name=base_name,
+            separator='-' if self.flatten else '/'
         )
+        Downloader.mkdir(folder) if not self.flatten else None
+        return filepath
+
+    def _gen_full_folder(self, meta):
+        safe_title = re.sub('[\?\\/><:"|\*.]', '', meta['title']).strip()
+        meta['folder_name'] = safe_title
+        folder = self.subfolder_pattern.format(**meta) 
         return self.resources_folder + '/' + folder
 
     @staticmethod
