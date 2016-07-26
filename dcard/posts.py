@@ -84,8 +84,11 @@ class PostsResult:
         comments_blocks = bundle.get('comments_async', [])
 
         results = []
-        for links, content, comments in zip(links_blocks, content_blocks, comments_blocks):
+        for links, content, comments in zip_longest(links_blocks, content_blocks, comments_blocks):
             posts = []
+
+            links = links or []
+            content = content or []
             comments = comments.get() if comments else []
             for lnks, cont, cmts in zip_longest(links, content, comments):
                 post = {}
