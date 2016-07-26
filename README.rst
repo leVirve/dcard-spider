@@ -154,8 +154,8 @@ Advanced
 
 -  class ``Posts`` 下的 ``downloader`` 提供 hacking 選項
 
-   - `subfolder_pattern` 可自定義子資料夾命名規則
-   - `flatten` 選項可選擇將所有資源(圖片)放在一層資料夾下，而不要按照文章分子資料夾
+   - ``subfolder_pattern`` 可自定義子資料夾命名規則
+   - ``flatten`` 選項可選擇將所有資源(圖片)放在一層資料夾下，而不要按照文章分子資料夾
 
 .. code:: python
 
