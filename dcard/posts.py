@@ -25,7 +25,7 @@ class Post:
         if links:
             bundle['links_futures'] = [
                 [
-                    client.sget(api.post_links_url_pattern.format(post_id=post_id))
+                    client.fut_get(api.post_links_url_pattern.format(post_id=post_id))
                     for post_id in ids
                 ]
                 for ids in client.chunks(self.ids, chunck_size=Post.reduce_threshold)
@@ -33,7 +33,7 @@ class Post:
         if content:
             bundle['content_futures'] = [
                 [
-                    client.sget(api.post_url_pattern.format(post_id=post_id))
+                    client.fut_get(api.post_url_pattern.format(post_id=post_id))
                     for post_id in ids
                 ]
                 for ids in client.chunks(self.ids, chunck_size=Post.reduce_threshold)
