@@ -91,6 +91,9 @@ ENV/
 # Pycharm stuff
 .idea
 
+# VS Code stuff
+.vscode
+
 # data collection
 data/
 
