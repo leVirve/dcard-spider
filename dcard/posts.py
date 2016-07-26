@@ -18,7 +18,7 @@ class Post:
                 else [metas]
         self.ids = ids
 
-    def get(self, content=True, comments=True, links=True):
+    def get(self, content=True, comments=True, links=True, callback=None):
         bundle = {}
         if links:
             bundle['links_futures'] = [
@@ -34,7 +34,7 @@ class Post:
             bundle['comments_async'] = \
                 client.parallel_tasks(Post._get_comments, self.ids)
 
-        return PostsResult(self.ids, bundle)
+        return PostsResult(self.ids, bundle, callback)
 
     @staticmethod
     def _get_comments(post_id):
@@ -54,9 +54,11 @@ class Post:
 
 class PostsResult:
 
-    def __init__(self, ids, bundle):
+    reduce_threshold = 1000
+
+    def __init__(self, ids, bundle, callback=None):
         self.ids = ids
-        self.results = self.format(bundle)
+        self.results = self.format(bundle, callback)
         self.downloader = Downloader()
 
     def __len__(self):
@@ -68,13 +70,13 @@ class PostsResult:
     def __getitem__(self, key):
         return self.results[int(key)]
 
-    def format(self, bundle):
+    def format(self, bundle, callback):
         links = bundle.get('links_futures', [])
         content = bundle.get('content_futures', [])
         comments = bundle.get('comments_async')
         comments = comments.get() if comments else []
 
-        results = []
+        posts, results = [], []
         for lnks, cont, cmts in zip_longest(links, content, comments):
             post = {}
             post.update(cont.result().json()) if cont else None
@@ -82,7 +84,15 @@ class PostsResult:
                 'links': lnks.result().json() if lnks else None,
                 'comments': cmts,
             })
-            results.append(post)
+            posts.append(post)
+
+            if len(posts) >= PostsResult.reduce_threshold:
+                results.append(callback(posts) if callback else posts)
+                posts = []
+        results.append(callback(posts) if callback else posts)
+
+        if len(results) and isinstance(results[0], list):
+            results = client.flatten_result_lists(results)
 
         return results
 

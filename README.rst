@@ -79,7 +79,7 @@ Basic
 .. code:: python
 
     ariticle_metas = dcard.forums('funny').get_metas(num=150, sort='new')
-    ariticle_metas = dcard.forums('funny').get_metas(num=30, sort='popular')
+    ariticle_metas = dcard.forums('funny').get_metas(num=100, sort='popular')
 
 -  提供一次取得多篇文章詳細資訊(全文、引用連結、所有留言)
 
@@ -115,6 +115,9 @@ Advanced
 
 .. code:: python
 
+
+    # In `dcard.forums().get_metas()`
+
     def collect_ids(metas):
         return [meta['id'] for meta in metas]
 
@@ -129,6 +132,17 @@ Advanced
 
     ids = dcard.forums('funny').get_metas(num=50, callback=collect_ids)
     ids = dcard.forums('funny').get_metas(num=50, callback=標題含有圖片關鍵字)
+
+
+
+    # In `dcard.posts().get()`, take `MongoDB` as backend database for example
+
+    def store_to_db(posts):
+        result = db[forum_name].insert_many([p for p in posts])
+        print('#Forum {}: insert {} items'.format(forum_name, len(result.inserted_ids)))
+
+    none_return_value = dcard.posts(metas).get(callback=store_to_db)
+
 
 -  爬取文章時提供 content, links, comments
    三個參數，能選擇略過不需要的資訊以加快爬蟲速度。
