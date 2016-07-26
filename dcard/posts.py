@@ -104,7 +104,7 @@ class PostsResult:
                 })
                 posts.append(post)
             results.append(callback(posts) if callback else posts)
-            logger.info('[PostResult reducer] {} posts processed.'.format(len(posts)))
+            logger.info('[PostResult reducer] {0} posts processed.'.format(len(posts)))
 
         if len(results) and isinstance(results[0], list):
             results = client.flatten_result_lists(results)

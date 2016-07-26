@@ -53,7 +53,7 @@ class Downloader:
             tasks += [(self._gen_filepath(meta, url), url) for url in urls]
 
         results = client.parallel_tasks(download, tasks).get()
-        logger.info('[Downloader] finish {} items!'.format(len(results)))
+        logger.info('[Downloader] finish {0} items!'.format(len(results)))
         return results
 
     def _gen_filepath(self, meta, url):
@@ -100,7 +100,7 @@ class ContentParser:
 
         logger.info('[ContentParser] takes hand')
         resoures = [parse(post) for post in self.results]
-        logger.info('[ContentParser] collects {} resources'.format(len(resoures)))
+        logger.info('[ContentParser] collects {0} resources'.format(len(resoures)))
         return resoures
 
     @staticmethod
