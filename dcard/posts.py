@@ -1,9 +1,13 @@
 from __future__ import absolute_import
+
+import logging
 from six.moves import zip_longest
 
 from dcard import api
 from dcard.manager import ContentParser, Downloader
 from dcard.utils import client
+
+logger = logging.getLogger('dcard')
 
 
 class Post:
@@ -79,6 +83,7 @@ class PostsResult:
         return self.results[int(key)]
 
     def format(self, bundle, callback):
+        logger.info('[PostResult reducer] takes hand.')
         links_blocks = bundle.get('links_futures', [])
         content_blocks = bundle.get('content_futures', [])
         comments_blocks = bundle.get('comments_async', [])
@@ -99,6 +104,7 @@ class PostsResult:
                 })
                 posts.append(post)
             results.append(callback(posts) if callback else posts)
+            logger.info('[PostResult reducer] {} posts processed.'.format(len(posts)))
 
         if len(results) and isinstance(results[0], list):
             results = client.flatten_result_lists(results)

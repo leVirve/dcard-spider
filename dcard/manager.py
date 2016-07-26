@@ -2,8 +2,11 @@ from __future__ import absolute_import, unicode_literals
 
 import os
 import re
+import logging
 
 from dcard.utils import client
+
+logger = logging.getLogger('dcard')
 
 
 reg_images    = re.compile('http[s]?://\S+\.(?:jpg|png|gif)')
@@ -40,6 +43,7 @@ class Downloader:
         self.resource_bundles = resource_bundles
 
     def download(self):
+        logger.info('[Downloader] takes hand')
         tasks = []
         for bundle in self.resource_bundles:
             meta, urls = bundle
@@ -48,8 +52,9 @@ class Downloader:
             self.done_resources += len(urls)
             tasks += [(self._gen_filepath(meta, url), url) for url in urls]
 
-        results = client.parallel_tasks(download, tasks)
-        return results.get()
+        results = client.parallel_tasks(download, tasks).get()
+        logger.info('[Downloader] finish {} items!'.format(len(results)))
+        return results
 
     def _gen_filepath(self, meta, url):
         folder = self._gen_full_folder(meta)
@@ -90,7 +95,9 @@ class ContentParser:
         if isinstance(self.results, dict):
             return [parse(self.results)]
 
+        logger.info('[ContentParser] takes hand')
         resoures = [parse(post) for post in self.results]
+        logger.info('[ContentParser] collects {} resources'.format(len(resoures)))
         return resoures
 
     @staticmethod
