@@ -87,8 +87,11 @@ class ContentParser:
     def parse(self):
 
         def parse(post):
-            article = post['content']
+            article = post.get('content') or ''
+            comments = post.get('comments') or []
             imgur_files = ContentParser._parse_images(article)
+            for comment in comments:
+                imgur_files += ContentParser._parse_images(comment['content'])
             del post['content']
             return (post, imgur_files)
 
