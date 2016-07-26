@@ -21,7 +21,7 @@ parser.add_argument(
 parser.add_argument(
     '-F', '--flatten', action='store_true', help='Option for flattening folders')
 parser.add_argument(
-    '-V', '--version', action='version', version=dcard.__VERSION__)
+    '-V', '--version', action='version', version=dcard.__version__)
 
 
 def main():
