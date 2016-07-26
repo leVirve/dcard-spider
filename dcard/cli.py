@@ -17,6 +17,10 @@ parser.add_argument(
 parser.add_argument(
     '-likes', '--likes_threshold', type=int, help='Specific minimum like counts')
 parser.add_argument(
+    '-o', '--output', type=str, help='Specific folder to store the resources')
+parser.add_argument(
+    '-F', '--flatten', action='store_true', help='Option for flattening folders')
+parser.add_argument(
     '-V', '--version', action='version', version=dcard.__VERSION__)
 
 
@@ -47,6 +51,13 @@ def download(args):
         .forums(args.forum) \
         .get_metas(num=args.number, callback=collect_ids)
     posts = dcard.posts(ids).get(comments=False, links=False)
+
+    if args.flatten:
+        posts.downloader.subfolder_pattern = '[{likeCount}推] {id}-{folder_name}'
+        posts.downloader.flatten = True
+    if args.output:
+        posts.downloader.resources_folder = args.output
+
     resources = posts.parse_resources()
     status = posts.download(resources)
 

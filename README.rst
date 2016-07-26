@@ -57,8 +57,13 @@ Command line
 ~~~~~~~~~~~~
 ::
 
-    dcard download -f [forums name] -n [number of posts] (optional: -likes [likes threshold])
-
+    dcard download -f [forums name] -n [number of posts]
+    
+    (options:)
+            -likes      [likes threshold]
+            -o          [output download folder]
+            -F          [flatten all subfolders]
+            -V          [show version of dcard-spider]
 
 Basic
 ~~~~~

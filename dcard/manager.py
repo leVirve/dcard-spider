@@ -37,13 +37,13 @@ class Downloader:
         self.subfolder_pattern = subfolder_pattern or '({id}) {folder_name}'
         self.done_resources = 0
         self.flatten = flatten
-        Downloader.mkdir(self.resources_folder)
 
     def set_bundles(self, resource_bundles):
         self.resource_bundles = resource_bundles
 
     def download(self):
         logger.info('[Downloader] takes hand')
+        Downloader.mkdir(self.resources_folder)
         tasks = []
         for bundle in self.resource_bundles:
             meta, urls = bundle
