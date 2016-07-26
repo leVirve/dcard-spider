@@ -29,7 +29,13 @@ class Client:
     def parallel_tasks(self, function, tasks):
         return self.thread_pool.map_async(function, tasks)
 
-    def flatten_result_lists(self, meta_lists):
+    @staticmethod
+    def flatten_result_lists(meta_lists):
         return list(itertools.chain.from_iterable(meta_lists))
+
+    @staticmethod
+    def chunks(elements, chunck_size=30):
+        for i in range(0, len(elements), chunck_size):
+            yield elements[i:i+chunck_size]
 
 client = Client()

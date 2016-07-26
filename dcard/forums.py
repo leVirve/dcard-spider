@@ -33,9 +33,13 @@ class Forum:
             pages += 1
 
         results = []
-        for i, metas in enumerate(self._get_metas(pages, sort)):
-            if (i + 1) * Forum.metas_per_page > num:
-                metas = metas[:num - i * Forum.metas_per_page]
+        for i, bundle in enumerate(zip(
+                self._get_metas(pages, sort),
+                client.chunks(range(num), chunck_size=30)
+            )):
+            metas, page = bundle
+            s, e = page[0] - i * 30, page[-1] - i * 30 + 1
+            metas = metas[s:e]
             results.append(callback(metas) if callback else metas)
 
         if len(results) and isinstance(results[0], list):
