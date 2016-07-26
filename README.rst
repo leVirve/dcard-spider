@@ -49,15 +49,16 @@ Example
     :alt: Demo result
     :figclass: align-center
 
+
+Usage
+-----
+
 Command line
-------------
+~~~~~~~~~~~~
 ::
 
     dcard download -f [forums name] -n [number of posts] (optional: -likes [likes threshold])
 
-
-Usage
------
 
 Basic
 ~~~~~
