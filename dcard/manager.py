@@ -68,7 +68,7 @@ class Downloader:
         return filepath
 
     def _gen_full_folder(self, meta):
-        safe_title = re.sub('[\?\\/><:"|\*.]', '', meta['title']).strip()
+        safe_title = re.sub('[\?\\\\/><:"|\*]', '', meta['title']).strip()
         meta['folder_name'] = safe_title
         folder = self.subfolder_pattern.format(**meta) 
         return self.resources_folder + '/' + folder
