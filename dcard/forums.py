@@ -39,7 +39,7 @@ class Forum:
             results.append(callback(metas) if callback else metas)
 
         if len(results) and isinstance(results[0], list):
-            results = Forum._flatten_result_lists(results)
+            results = client.flatten_result_lists(results)
             results = results[:num]
 
         logger.info('資訊蒐集完成，共%d筆' % len(results))
@@ -55,10 +55,6 @@ class Forum:
             except IndexError:
                 logger.warning('已到最末頁，第%d頁!' % _)
                 return
-
-    @staticmethod
-    def _flatten_result_lists(meta_lists):
-        return list(itertools.chain.from_iterable(meta_lists))
 
     @staticmethod
     def _extract_general(forums):

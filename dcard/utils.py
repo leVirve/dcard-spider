@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import itertools
 from multiprocessing.dummy import Pool
 
 import requests
@@ -27,5 +28,8 @@ class Client:
 
     def parallel_tasks(self, function, tasks):
         return self.thread_pool.map_async(function, tasks)
+
+    def flatten_result_lists(self, meta_lists):
+        return list(itertools.chain.from_iterable(meta_lists))
 
 client = Client()
