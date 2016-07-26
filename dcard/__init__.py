@@ -4,6 +4,9 @@ import logging
 from dcard.dcard import *
 
 
+__VERSION__ = '0.2.5'
+
+
 logger = logging.getLogger('dcard')
 logger.setLevel(logging.DEBUG)
 

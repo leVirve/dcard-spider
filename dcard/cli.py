@@ -4,17 +4,20 @@ from __future__ import unicode_literals, absolute_import
 import time
 import argparse
 
+import dcard
 from dcard.dcard import Dcard
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    "mode", help="download / meta mode")
+    'mode', help='download / meta mode')
 parser.add_argument(
-    "-f", "--forum", help="Specific which forum")
+    '-f', '--forum', help='Specific which forum')
 parser.add_argument(
-    "-n", "--number", type=int, help="Scan through how many posts")
+    '-n', '--number', type=int, help='Scan through how many posts')
 parser.add_argument(
-    "-likes", "--likes_threshold", type=int, help="Specific minimum like counts")
+    '-likes', '--likes_threshold', type=int, help='Specific minimum like counts')
+parser.add_argument(
+    '-V', '--version', action='version', version=dcard.__VERSION__)
 
 
 def main():
