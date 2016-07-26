@@ -16,7 +16,7 @@ def may_contain_resourse_post_ids():
 def test_post_bundle(article_id):
     posts = Dcard.posts(article_id).get()
     post = posts[0]
-    comment_count = post['content']['commentCount']
+    comment_count = post['commentCount']
     assert comment_count == len(post['comments'])
 
 
@@ -30,7 +30,7 @@ def test_post_bundles(forums):
     posts2 = Dcard.posts(ids).get(comments=False, links=False)
     assert len(posts1) == len(posts2)
 
-    titles = [post['content']['title'] for post in posts1]
+    titles = [post['title'] for post in posts1]
     assert all(titles)
 
 

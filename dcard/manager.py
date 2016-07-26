@@ -83,10 +83,9 @@ class ContentParser:
 
         def parse(post):
             article = post['content']
-            content = article['content']
-            imgur_files = ContentParser._parse_images(content)
-            del article['content']
-            return (article, imgur_files)
+            imgur_files = ContentParser._parse_images(article)
+            del post['content']
+            return (post, imgur_files)
 
         if isinstance(self.results, dict):
             return [parse(self.results)]

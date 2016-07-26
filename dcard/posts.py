@@ -74,13 +74,16 @@ class PostsResult:
         comments = bundle.get('comments_async')
         comments = comments.get() if comments else []
 
-        results = [
-            {
+        results = []
+        for lnks, cont, cmts in zip_longest(links, content, comments):
+            post = {}
+            post.update(cont.result().json()) if cont else None
+            post.update({
                 'links': lnks.result().json() if lnks else None,
-                'content': cont.result().json() if cont else None,
                 'comments': cmts,
-            } for lnks, cont, cmts in zip_longest(links, content, comments)
-        ]
+            })
+            results.append(post)
+
         return results
 
     def parse_resources(self):
