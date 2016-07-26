@@ -5,6 +5,8 @@ import itertools
 from multiprocessing.dummy import Pool
 
 import requests
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 from requests_futures.sessions import FuturesSession
 
 
@@ -14,6 +16,11 @@ class Client:
         self.fut_session = FuturesSession(max_workers=8)
         self.req_session = requests.Session()
         self.thread_pool = Pool(processes=8)
+        self.retries = Retry(
+            total=5,
+            backoff_factor=0.1,
+            status_forcelist=[500, 502, 503, 504])
+        self.req_session.mount('https://', HTTPAdapter(max_retries=self.retries))
 
     def get(self, url, **kwargs):
         response = self.req_session.get(url, **kwargs)
