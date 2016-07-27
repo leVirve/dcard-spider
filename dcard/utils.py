@@ -35,7 +35,8 @@ class Client:
                 raise ServerResponsedError
             return data
         except ServerResponsedError:
-            logger.error('when get {}, error {}'.format(url, data))
+            logger.error('when get {}, error {}; status_code {}'.format(
+                url, data, response.status_code))
             return {}
         except httplib.IncompleteRead as e:
             logger.error('when get {}, error {}; partial: {}'.format(url, e, e.partial))
