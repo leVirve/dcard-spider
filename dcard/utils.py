@@ -4,6 +4,7 @@ import os
 import logging
 import itertools
 from multiprocessing.dummy import Pool
+from six.moves import http_client as httplib
 
 import requests
 from requests.adapters import HTTPAdapter
@@ -31,9 +32,14 @@ class Client:
             response = self.req_session.get(url, **kwargs)
             data = response.json()
             if isinstance(data, dict) and data.get('error'):
-                logger.error('when get {}, error {}'.format(url, data))
-                return {}
+                raise ServerResponsedError
             return data
+        except ServerResponsedError:
+            logger.error('when get {}, error {}'.format(url, data))
+            return {}
+        except httplib.IncompleteRead as e:
+            logger.error('when get {}, error {}; partial: {}'.format(url, e, e.partial))
+            return {}  # or should we return `e.partial` ?
         except RetryError as e:
             logger.error('when get {}, error {}'.format(url, e))
 
@@ -54,5 +60,9 @@ class Client:
     def chunks(elements, chunck_size=30):
         for i in range(0, len(elements), chunck_size):
             yield elements[i:i+chunck_size]
+
+
+class ServerResponsedError(Exception):
+    pass
 
 client = Client()
