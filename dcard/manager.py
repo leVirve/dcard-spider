@@ -4,7 +4,7 @@ import os
 import re
 import logging
 
-from dcard.utils import client
+from dcard.utils import Client
 
 logger = logging.getLogger('dcard')
 
@@ -13,6 +13,8 @@ reg_images    = re.compile('http[s]?://\S+\.(?:jpg|png|gif)')
 reg_imgur     = re.compile('http[s]?://imgur.com/(\w+)')
 reg_imgur_file = re.compile('http[s]?://i.imgur.com/\w+\.(?:jpg|png|gif)')
 pattern_imgur_file = 'http://i.imgur.com/{img_hash}.jpg'
+
+client = Client()
 
 
 def download(task):

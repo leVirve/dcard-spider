@@ -5,7 +5,7 @@ import logging
 import itertools
 
 from dcard import api
-from dcard.utils import client
+from dcard.utils import Client
 
 logger = logging.getLogger('dcard')
 
@@ -13,6 +13,7 @@ logger = logging.getLogger('dcard')
 class Forum:
 
     metas_per_page = 30
+    client = Client()
 
     def __init__(self, forum):
         self.forum = forum
@@ -20,9 +21,9 @@ class Forum:
 
     @staticmethod
     def get(no_school=False):
-        forums = client.get(api.forums_url)
+        forums = Forum.client.get(api.forums_url)
         if no_school:
-            return [forum for forum in self._extract_general(forums)]
+            return [forum for forum in Forum._extract_general(forums)]
         return forums
 
     def get_metas(self, num=30, sort='new', callback=None):
@@ -38,7 +39,7 @@ class Forum:
             results.append(callback(metas) if callback else metas) # buffer?
 
         if len(results) and isinstance(results[0], list):
-            results = client.flatten_lists(results)
+            results = self.client.flatten_lists(results)
 
         logger.info('[%s] 資訊蒐集完成，共%d筆' % (self.forum, len(results)))
         return results
@@ -46,7 +47,7 @@ class Forum:
     def _get_paged_metas(self, pages, sort):
         params = {'popular': False} if sort == 'new' else {}
         for page in range(pages):  
-            data = client.get(self.posts_meta_url, params=params)
+            data = self.client.get(self.posts_meta_url, params=params)
             if len(data) == 0:
                 logger.warning('[%s] 已到最末頁，第%d頁!' % (self.forum, page))
             params['before'] = data[-1]['id']

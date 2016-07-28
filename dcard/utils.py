@@ -14,7 +14,21 @@ from requests_futures.sessions import FuturesSession
 logger = logging.getLogger('dcard')
 
 
-class Client:
+class _Singleton(type):
+
+    _instances = {}
+
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(_Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
+
+
+class Singleton(_Singleton('SingletonMeta', (object,), {})):
+    pass
+
+
+class Client(Singleton):
 
     def __init__(self, workers=8):
         self.fut_session = FuturesSession(max_workers=workers)
@@ -64,5 +78,3 @@ class Client:
 
 class ServerResponsedError(Exception):
     pass
-
-client = Client()  # leak, use singleton
