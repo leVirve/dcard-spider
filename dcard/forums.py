@@ -5,7 +5,7 @@ import logging
 import itertools
 
 from dcard import api
-from dcard.utils import Client
+from dcard.utils import Client, flatten_lists
 
 logger = logging.getLogger('dcard')
 
@@ -39,7 +39,7 @@ class Forum:
             results.append(callback(metas) if callback else metas) # buffer?
 
         if len(results) and isinstance(results[0], list):
-            results = self.client.flatten_lists(results)
+            results = flatten_lists(results)
 
         logger.info('[%s] 資訊蒐集完成，共%d筆' % (self.forum, len(results)))
         return results

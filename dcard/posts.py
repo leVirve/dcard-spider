@@ -5,7 +5,7 @@ from six.moves import zip_longest
 
 from dcard import api
 from dcard.manager import ContentParser, Downloader
-from dcard.utils import Client
+from dcard.utils import Client, flatten_lists, chunks
 
 logger = logging.getLogger('dcard')
 
@@ -33,7 +33,7 @@ class Post:
                     self.client.fut_get(api.post_links_url_pattern.format(post_id=post_id))
                     for post_id in ids
                 ]
-                for ids in self.client.chunks(self.ids, chunck_size=Post.reduce_threshold)
+                for ids in chunks(self.ids, chunck_size=Post.reduce_threshold)
             ]
         if content:
             bundle['content_futures'] = [
@@ -41,12 +41,12 @@ class Post:
                     self.client.fut_get(api.post_url_pattern.format(post_id=post_id))
                     for post_id in ids
                 ]
-                for ids in self.client.chunks(self.ids, chunck_size=Post.reduce_threshold)
+                for ids in chunks(self.ids, chunck_size=Post.reduce_threshold)
             ]
         if comments:
             bundle['comments_async'] = [
                 self.client.parallel_tasks(Post._serially_get_comments, ids)
-                for ids in self.client.chunks(self.ids, chunck_size=Post.reduce_threshold)
+                for ids in chunks(self.ids, chunck_size=Post.reduce_threshold)
             ]
 
         return PostsResult(self.ids, bundle, callback)
@@ -68,8 +68,6 @@ class Post:
 
 
 class PostsResult:
-
-    client = Client()
 
     def __init__(self, ids, bundle, callback=None):
         self.ids = ids
@@ -110,7 +108,7 @@ class PostsResult:
             logger.info('[PostResult reducer] {0} posts processed.'.format(len(posts)))
 
         if len(results) and isinstance(results[0], list):
-            results = self.client.flatten_lists(results)
+            results = flatten_lists(results)
 
         return results
 

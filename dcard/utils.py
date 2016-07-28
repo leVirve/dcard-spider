@@ -33,7 +33,7 @@ class Client(Singleton):
     def __init__(self, workers=8):
         self.fut_session = FuturesSession(max_workers=workers)
         self.req_session = requests.Session()
-        self.thread_pool = Pool(processes=workers)
+        self.thread_pool = Pool(processes=workers) # how to recycle?
         self.retries = Retry(
             total=5,
             backoff_factor=0.1,
@@ -66,14 +66,14 @@ class Client(Singleton):
     def parallel_tasks(self, function, tasks):
         return self.thread_pool.map_async(function, tasks)
 
-    @staticmethod
-    def flatten_lists(meta_lists):
-        return list(itertools.chain.from_iterable(meta_lists))
 
-    @staticmethod
-    def chunks(elements, chunck_size=30):
-        for i in range(0, len(elements), chunck_size):
-            yield elements[i:i+chunck_size]
+def flatten_lists(meta_lists):
+    return list(itertools.chain.from_iterable(meta_lists))
+
+
+def chunks(elements, chunck_size=30):
+    for i in range(0, len(elements), chunck_size):
+        yield elements[i:i+chunck_size]
 
 
 class ServerResponsedError(Exception):
