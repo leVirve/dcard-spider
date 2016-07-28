@@ -107,7 +107,7 @@ class PostsResult:
             logger.info('[PostResult reducer] {0} posts processed.'.format(len(posts)))
 
         if len(results) and isinstance(results[0], list):
-            results = client.flatten_result_lists(results)
+            results = client.flatten_lists(results)
 
         return results
 

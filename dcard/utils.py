@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import os
 import logging
 import itertools
 from multiprocessing.dummy import Pool
@@ -54,7 +53,7 @@ class Client:
         return self.thread_pool.map_async(function, tasks)
 
     @staticmethod
-    def flatten_result_lists(meta_lists):
+    def flatten_lists(meta_lists):
         return list(itertools.chain.from_iterable(meta_lists))
 
     @staticmethod
@@ -66,4 +65,4 @@ class Client:
 class ServerResponsedError(Exception):
     pass
 
-client = Client()
+client = Client()  # leak, use singleton

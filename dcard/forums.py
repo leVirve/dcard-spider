@@ -22,43 +22,35 @@ class Forum:
     def get(no_school=False):
         forums = client.get(api.forums_url)
         if no_school:
-            return [forum for forum in Forum._extract_general(forums)]
+            return [forum for forum in self._extract_general(forums)]
         return forums
 
     def get_metas(self, num=30, sort='new', callback=None):
-        logger.info('開始取得看板 [%s] 內文章資訊' % self.forum)
+        logger.info('[%s] 開始取得看板內文章資訊' % self.forum)
 
-        pages = num // Forum.metas_per_page
-        if num % Forum.metas_per_page != 0:
-            pages += 1
+        pages = -(-num // self.metas_per_page)
+        paged_metas = self._get_paged_metas(pages, sort)
 
         results = []
-        for i, bundle in enumerate(zip(
-                self._get_metas(pages, sort),
-                client.chunks(range(num), chunck_size=30)
-            )):
-            metas, page = bundle
-            s, e = page[0] - i * 30, page[-1] - i * 30 + 1
-            metas = metas[s:e]
-            results.append(callback(metas) if callback else metas)
+        for page, metas in enumerate(paged_metas, start=1):
+            if page == pages:
+                metas = metas[:num - (pages - 1) * self.metas_per_page]
+            results.append(callback(metas) if callback else metas) # buffer?
 
         if len(results) and isinstance(results[0], list):
-            results = client.flatten_result_lists(results)
-            results = results[:num]
+            results = client.flatten_lists(results)
 
-        logger.info('資訊蒐集完成，共%d筆' % len(results))
+        logger.info('[%s] 資訊蒐集完成，共%d筆' % (self.forum, len(results)))
         return results
 
-    def _get_metas(self, pages, sort):
+    def _get_paged_metas(self, pages, sort):
         params = {'popular': False} if sort == 'new' else {}
-        for _ in range(pages):
+        for page in range(pages):  
             data = client.get(self.posts_meta_url, params=params)
-            try:
-                params['before'] = data[-1]['id']
-                yield data
-            except IndexError:
-                logger.warning('已到最末頁，第%d頁!' % _)
-                return
+            if len(data) == 0:
+                logger.warning('[%s] 已到最末頁，第%d頁!' % (self.forum, page))
+            params['before'] = data[-1]['id']
+            yield data
 
     @staticmethod
     def _extract_general(forums):
