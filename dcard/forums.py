@@ -55,6 +55,7 @@ class Forum:
 
             if len(data) == 0:
                 logger.warning('[%s] 已到最末頁，第%d頁!' % (self.forum, page))
+                return
 
             params['before'] = data[-1]['id']
             yield data
