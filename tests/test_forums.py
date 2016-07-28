@@ -35,8 +35,8 @@ def test_multi_post_metas_with_callback(forums):
         return None
 
     def simulate_store_into_db(metas):
-        some_id = 987654
-        return some_id
+        some_ids = [987654, 5156612]
+        return some_ids
 
     forum = forums.get('test')['alias']
 
@@ -46,5 +46,4 @@ def test_multi_post_metas_with_callback(forums):
 
     assert len(ids) != 0
     assert len(rids) != 0
-    assert len(none) != 0
-    assert none == [None] * len(none)
+    assert none == None
