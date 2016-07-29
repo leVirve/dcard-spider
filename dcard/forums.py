@@ -2,7 +2,6 @@
 from __future__ import unicode_literals, absolute_import
 
 import logging
-import itertools
 
 from dcard import api
 from dcard.utils import Client, flatten_lists
@@ -50,7 +49,7 @@ class Forum:
     def _get_paged_metas(self, pages, sort):
         params = {'popular': False} if sort == 'new' else {}
 
-        for page in range(pages):  
+        for page in range(pages):
             data = self.client.get(self.posts_meta_url, params=params)
 
             if len(data) == 0:
