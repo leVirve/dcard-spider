@@ -90,8 +90,10 @@ class PostsResult:
     downloader = Downloader()
 
     def __init__(self, bundle, massive=True, callback=None):
+        logger.info('[PostResult] takes hand.')
         self.massive = massive
         self.results = list(self.reformat(bundle, callback))
+        logger.info('[PostResult] {} posts processed.'.format(len(self.results)))
 
     def __len__(self):
         return len(self.results)
