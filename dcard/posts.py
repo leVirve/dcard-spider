@@ -12,7 +12,6 @@ logger = logging.getLogger('dcard')
 
 class Post:
 
-    reduce_threshold = 1000
     comments_per_page = 30
     client = Client()
 
@@ -23,35 +22,13 @@ class Post:
         self.ids = metadata if self.only_id else [m['id'] for m in metadata]
         self.metas = metadata if not self.only_id else None
 
-    def get(self, **kwargs):
-        if self.only_id:
-            raw_posts = self.get_posts_by_id(**kwargs)
-            return PostsResult(raw_posts, massive=False)
-        else:
-            raw_posts = self.get_post_by_meta(**kwargs)
-            return PostsResult(raw_posts)
-
-    def get_posts_by_id(self, content=True, links=True, comments=True):
-        return {
+    def get(self, content=True, links=True, comments=True):
+        raw_posts = {
             'content': self.get_content(self.ids) if content else [],
             'links': self.get_links(self.ids) if links else [],
-            'comments': (
-                self.get_comments_serial(post_id)
-                for post_id in self.ids
-                if comments
-            )
+            'comments': self.get_comments(self.ids, self.metas) if comments else ()
         }
-
-    def get_post_by_meta(self, content=True, links=True, comments=True):
-        return {
-            'content': self.get_content(self.ids) if content else [],
-            'links': self.get_links(self.ids) if links else [],
-            'comments': (
-                self.get_comments_parallel(meta['id'], meta['commentCount'])
-                for meta in self.metas
-                if comments
-            )
-        }
+        return PostsResult(raw_posts, massive=(not self.only_id))
 
     @classmethod
     def get_content(cls, post_ids):
@@ -72,10 +49,21 @@ class Post:
         return links_futures
 
     @classmethod
+    def get_comments(cls, post_ids, post_metas):
+        return (
+            cls.get_comments_parallel(meta['id'], meta['commentCount'])
+            for meta in post_metas
+        ) if post_metas else (
+            cls.get_comments_serial(post_id)
+            for post_id in post_ids
+        )
+
+    @classmethod
     def get_comments_parallel(cls, post_id, comments_count):
         pages = -(-comments_count // cls.comments_per_page)
         comments_futures = (
-            cls.client.fut_get(api.post_comments_url_pattern.format(post_id=post_id),
+            cls.client.fut_get(
+                api.post_comments_url_pattern.format(post_id=post_id),
                 params={'after': page * cls.comments_per_page})
             for page in range(pages)
         )
@@ -83,7 +71,6 @@ class Post:
 
     @classmethod
     def get_comments_serial(cls, post_id):
-        print('comment of %d' % post_id)
         comments_url = api.post_comments_url_pattern.format(post_id=post_id)
 
         params = {}
@@ -103,11 +90,8 @@ class PostsResult:
     downloader = Downloader()
 
     def __init__(self, bundle, massive=True, callback=None):
-        self.results = list(
-            self.format(bundle, callback)
-            if massive else
-            self.simple_format(bundle, callback)
-        )
+        self.massive = massive
+        self.results = list(self.reformat(bundle, callback))
 
     def __len__(self):
         return len(self.results)
@@ -118,7 +102,7 @@ class PostsResult:
     def __getitem__(self, key):
         return self.results[int(key)]
 
-    def simple_format(self, bundle, callback):
+    def reformat(self, bundle, callback):
         for content, links, comments in zip_longest(
             bundle['content'], bundle['links'], bundle['comments']
         ):
@@ -126,21 +110,13 @@ class PostsResult:
             post.update(content.result().json()) if content else None
             post.update({
                 'links': links.result().json() if links else None,
-                'comments': comments
+                'comments': self.extract_comments(comments)
             })
             yield post
 
-    def format(self, bundle, callback):
-        for content, links, comments in zip_longest(
-            bundle['content'], bundle['links'], bundle['comments']
-        ):
-            post = {}
-            post.update(content.result().json()) if content else None
-            post.update({
-                'links': links.result().json() if links else None,
-                'comments': flatten_lists([cmts.result().json() for cmts in comments]) if comments else None
-            })
-            yield post
+    def extract_comments(self, comments):
+        return flatten_lists([cmts.result().json() for cmts in comments]) \
+            if self.massive and comments else comments
 
     def parse_resources(self):
         parser = ContentParser(self.results)
