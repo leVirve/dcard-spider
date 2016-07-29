@@ -75,10 +75,11 @@ class Post:
     def get_comments_parallel(cls, post_id, comments_count):
         pages = -(-comments_count // cls.comments_per_page)
         comments_futures = (
-            self.client.fut_get(api.post_url_pattern.format(post_id=post_id),
-                params={'after': page * self.comments_per_page})
+            cls.client.fut_get(api.post_comments_url_pattern.format(post_id=post_id),
+                params={'after': page * cls.comments_per_page})
             for page in range(pages)
         )
+        return comments_futures
 
     @classmethod
     def get_comments_serial(cls, post_id):
@@ -139,7 +140,6 @@ class PostsResult:
                 'links': links.result().json() if links else None,
                 'comments': flatten_lists([cmts.result().json() for cmts in comments]) if comments else None
             })
-            print(post)
             yield post
 
     def parse_resources(self):
