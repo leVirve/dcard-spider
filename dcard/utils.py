@@ -2,6 +2,7 @@
 
 import logging
 import itertools
+from json import JSONDecodeError
 from multiprocessing.dummy import Pool
 from six.moves import http_client as httplib
 
@@ -47,6 +48,12 @@ class Client(Singleton):
             if isinstance(data, dict) and data.get('error'):
                 raise ServerResponsedError
             return data
+        except JSONDecodeError:
+            man_retry = kwargs.get('man_retry', 1)
+            if man_retry > 5:
+                return {}
+            logger.error('when get {}, error {}; and retry#{}...'.format(url, e, man_retry))
+            return self.get(url, man_retry=man_retry + 1, **kwargs)
         except ServerResponsedError:
             logger.error('when get {}, error {}; status_code {}'.format(
                 url, data, response.status_code))
