@@ -44,6 +44,15 @@ class Forum:
         params = {'popular': False} if sort == 'new' else {}
         pages = -(-num // self.metas_per_page) if num >= 0 else self.infinite_page
 
+        def approved_metas(metas):
+            if num and page == pages:
+                metas = metas[:num - (pages - 1) * self.metas_per_page]
+
+            if timebound:
+                metas = [m for m in metas if m['updatedAt'] > timebound]
+
+            return metas
+
         page = 0
         while page != pages:
             page += 1
@@ -55,13 +64,9 @@ class Forum:
 
             params['before'] = metas[-1]['id']
 
-            if num and page == pages:
-                metas = metas[:num - (pages - 1) * self.metas_per_page]
-
-            if timebound:
-                metas = [m for m in metas if m['updatedAt'] > timebound]
-                if len(metas) is 0:
-                    return
+            metas = approved_metas(metas)
+            if len(metas) == 0:
+                return
 
             yield metas
 
