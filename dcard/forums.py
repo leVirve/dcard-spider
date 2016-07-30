@@ -60,6 +60,8 @@ class Forum:
 
             if timebound:
                 metas = [m for m in metas if m['updatedAt'] > timebound]
+                if len(metas) is 0:
+                    return
 
             yield metas
 
