@@ -5,6 +5,9 @@ dcard-spider
 
 Get posts and forums resourses through Dcard practical API on website.
 
+    *Originally this is a module of my another project leVirve/dcard-lumberjack <https://github.com/leVirve/dcard-lumberjack>.*
+
+
 Feature
 -------
 Embrace asynchronous tasks and multithreads. All works done in parallel or coroutine-like.
