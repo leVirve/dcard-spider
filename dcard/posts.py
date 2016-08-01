@@ -5,7 +5,7 @@ from six.moves import zip_longest
 
 from dcard import api
 from dcard.manager import ContentParser, Downloader
-from dcard.utils import Client, flatten_lists, chunks
+from dcard.utils import Client, flatten_lists
 
 logger = logging.getLogger('dcard')
 

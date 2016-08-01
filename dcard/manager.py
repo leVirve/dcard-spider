@@ -9,9 +9,13 @@ from dcard.utils import Client
 logger = logging.getLogger('dcard')
 
 
-reg_images    = re.compile('http[s]?://\S+\.(?:jpg|png|gif)')
-reg_imgur     = re.compile('http[s]?://imgur.com/(\w+)')
-reg_imgur_file = re.compile('http[s]?://i.imgur.com/\w+\.(?:jpg|png|gif)')
+reg_images = \
+    re.compile('http[s]?://\S+\.(?:jpg|png|gif)')
+reg_imgur = \
+    re.compile('http[s]?://imgur.com/(\w+)')
+reg_imgur_file = \
+    re.compile('http[s]?://i.imgur.com/\w+\.(?:jpg|png|gif)')
+
 pattern_imgur_file = 'http://i.imgur.com/{img_hash}.jpg'
 
 client = Client()
@@ -33,8 +37,8 @@ def download(task):
 
 class Downloader:
 
-    def __init__(self,
-        download_folder=None, subfolder_pattern=None, flatten=False):
+    def __init__(
+            self, download_folder=None, subfolder_pattern=None, flatten=False):
         self.resources_folder = download_folder or './downloads'
         self.subfolder_pattern = subfolder_pattern or '({id}) {folder_name}'
         self.done_resources = 0
@@ -72,7 +76,7 @@ class Downloader:
     def _gen_full_folder(self, meta):
         safe_title = re.sub('[\?\\\\/><:"|\*]', '', meta['title']).strip()
         meta['folder_name'] = safe_title
-        folder = self.subfolder_pattern.format(**meta) 
+        folder = self.subfolder_pattern.format(**meta)
         return self.resources_folder + '/' + folder
 
     @staticmethod
