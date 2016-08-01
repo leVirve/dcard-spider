@@ -4,7 +4,7 @@ import logging
 from dcard.dcard import Dcard  # noqa
 
 
-__version__ = '0.2.6'
+__version__ = '0.2.9'
 
 
 logger = logging.getLogger('dcard')
