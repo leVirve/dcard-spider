@@ -1,3 +1,5 @@
+import datetime
+
 import pytest
 
 from dcard import Dcard
@@ -11,9 +13,19 @@ def mock_all_requests(monkeypatch):
 
 
 @pytest.fixture(scope='module')
-def forums():
-    all_forums = Dcard.forums.get()
-    no_school_forums = Dcard.forums.get(no_school=True)
+def dcard():
+    return Dcard()
+
+
+@pytest.fixture(scope='module')
+def boundary_date():
+    return datetime.datetime.utcnow() - datetime.timedelta(days=1)
+
+
+@pytest.fixture(scope='module')
+def forums(dcard):
+    all_forums = dcard.forums.get()
+    no_school_forums = dcard.forums.get(no_school=True)
     return {
         'all': all_forums,
         'no_school': no_school_forums,

@@ -14,30 +14,33 @@ class Forum:
     metas_per_page = 30
     infinite_page = -1
 
-    client = Client()
+    def __init__(self, name=None):
+        self.name = None
+        self.posts_meta_url = None
+        self.client = Client()
+        self._initial_forum(name)
 
-    def __init__(self, forum):
-        self.forum = forum
-        self.posts_meta_url = api.posts_meta_url_pattern.format(forum=forum)
+    def __call__(self, name):
+        self._initial_forum(name)
+        return self
 
-    @staticmethod
-    def get(no_school=False):
-        forums = Forum.client.get(api.forums_url)
+    def get(self, no_school=False):
+        forums = self.client.get(api.forums_url)
         if no_school:
-            return [forum for forum in Forum._extract_general(forums)]
+            return [forum for forum in self._extract_general(forums)]
         return forums
 
     def get_metas(
             self, num=30, sort='new', timebound=None,
             callback=None):
-        logger.info('<%s> 開始取得看板內文章資訊' % self.forum)
+        logger.info('<%s> 開始取得看板內文章資訊' % self.name)
 
         paged_metas = self._get_paged_metas(sort, num, timebound)
 
         buff = flatten_lists((metas for metas in paged_metas))
         results = callback(buff) if callback else buff
 
-        logger.info('<%s> 資訊蒐集完成，共%d筆' % (self.forum, len(buff)))
+        logger.info('<%s> 資訊蒐集完成，共%d筆' % (self.name, len(buff)))
         return results
 
     def _get_paged_metas(self, sort, num, timebound=''):
@@ -59,7 +62,7 @@ class Forum:
             metas = self.client.get(self.posts_meta_url, params=params)
 
             if len(metas) == 0:
-                logger.warning('[%s] 已到最末頁，第%d頁!' % (self.forum, page))
+                logger.warning('[%s] 已到最末頁，第%d頁!' % (self.name, page))
                 return
 
             params['before'] = metas[-1]['id']
@@ -70,6 +73,9 @@ class Forum:
 
             yield metas
 
-    @staticmethod
-    def _extract_general(forums):
+    def _initial_forum(self, name):
+        self.name = name
+        self.posts_meta_url = api.posts_meta_url_pattern.format(forum=name)
+
+    def _extract_general(self, forums):
         return (forum for forum in forums if not forum['isSchool'])

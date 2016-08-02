@@ -9,5 +9,6 @@ __all__ = ['Dcard']
 
 class Dcard:
 
-    forums = Forum
-    posts = Post
+    def __init__(self):
+        self.forums = Forum()
+        self.posts = Post

@@ -3,6 +3,9 @@ import json
 import codecs
 
 
+post_metas_requests = 0
+
+
 class MockedRequest:
 
     mapping = [
@@ -26,11 +29,14 @@ class MockedRequest:
         for i, bundle in enumerate(MockedRequest.mapping):
 
             regex, path = bundle
-    
+
             if regex.search(url) is not None:
                 json = JsonResponse('./tests/data/' + path)
-                if i == 0 and kwargs.get('no_school'):
-                    path = 'forums.json'
+                if i == 1 and kwargs.get('params').get('before'):
+                    global post_metas_requests
+                    post_metas_requests += 1
+                    if post_metas_requests >= 50:  # cheating hacks Orz
+                        return JsonResponse()
                 elif i == 4:
                     json.comments_case = True
                     json.start = params.get('after', 0) if params else 0
@@ -53,7 +59,7 @@ class JsonResponse:
 
         if self.comments_case:
             start = self.start
-            end = start + 30 if start + 30 < len(result) else len(result) 
+            end = start + 30 if start + 30 < len(result) else len(result)
             result = result[start:end]
 
         return result
