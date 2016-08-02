@@ -11,4 +11,4 @@ class Dcard:
 
     def __init__(self):
         self.forums = Forum()
-        self.posts = Post
+        self.posts = Post()

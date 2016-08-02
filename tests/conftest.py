@@ -23,16 +23,5 @@ def boundary_date():
 
 
 @pytest.fixture(scope='module')
-def forums(dcard):
-    all_forums = dcard.forums.get()
-    no_school_forums = dcard.forums.get(no_school=True)
-    return {
-        'all': all_forums,
-        'no_school': no_school_forums,
-        'test': no_school_forums[-1]
-    }
-
-
-@pytest.fixture(scope='module')
-def article_id():
-    return 224341009
+def metas(dcard):
+    return dcard.forums('testfixure').get_metas()

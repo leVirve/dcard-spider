@@ -32,7 +32,9 @@ class MockedRequest:
 
             if regex.search(url) is not None:
                 json = JsonResponse('./tests/data/' + path)
-                if i == 1 and kwargs.get('params').get('before'):
+                if (i == 1
+                        and kwargs.get('params')
+                        and kwargs.get('params').get('before')):
                     global post_metas_requests
                     post_metas_requests += 1
                     if post_metas_requests >= 50:  # cheating hacks Orz

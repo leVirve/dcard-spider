@@ -13,14 +13,17 @@ logger = logging.getLogger('dcard')
 class Post:
 
     comments_per_page = 30
-    client = Client()
 
-    def __init__(self, metadata):
-        metadata = metadata if isinstance(metadata, list) else [metadata]
-        self.only_id = type(metadata[0]) is int
+    def __init__(self, metadata=None):
+        self.use_only_id = False
+        self.ids = []
+        self.metas = None
+        self.client = Client()
+        self._initial_metadata(metadata)
 
-        self.ids = metadata if self.only_id else [m['id'] for m in metadata]
-        self.metas = metadata if not self.only_id else None
+    def __call__(self, value):
+        self._initial_metadata(value)
+        return self
 
     def get(self, content=True, links=True, comments=True):
         raw_posts = {
@@ -28,61 +31,64 @@ class Post:
             'links': self.get_links(self.ids) if links else [],
             'comments': self.get_comments(self.ids, self.metas) if comments else ()
         }
-        return PostsResult(raw_posts, massive=(not self.only_id))
+        return PostsResult(raw_posts, massive=(not self.use_only_id))
 
-    @classmethod
-    def get_content(cls, post_ids):
+    def get_content(self, post_ids):
         content_futures = (
-            cls.client.fut_get(
+            self.client.fut_get(
                 api.post_url_pattern.format(post_id=post_id))
             for post_id in post_ids
         )
         return content_futures
 
-    @classmethod
-    def get_links(cls, post_ids):
+    def get_links(self, post_ids):
         links_futures = (
-            cls.client.fut_get(
+            self.client.fut_get(
                 api.post_links_url_pattern.format(post_id=post_id))
             for post_id in post_ids
         )
         return links_futures
 
-    @classmethod
-    def get_comments(cls, post_ids, post_metas):
+    def get_comments(self, post_ids, post_metas):
         return (
-            cls.get_comments_parallel(meta['id'], meta['commentCount'])
+            self.get_comments_parallel(meta['id'], meta['commentCount'])
             for meta in post_metas
         ) if post_metas else (
-            cls.get_comments_serial(post_id)
+            self.get_comments_serial(post_id)
             for post_id in post_ids
         )
 
-    @classmethod
-    def get_comments_parallel(cls, post_id, comments_count):
-        pages = -(-comments_count // cls.comments_per_page)
+    def get_comments_parallel(self, post_id, comments_count):
+        pages = -(-comments_count // self.comments_per_page)
         comments_futures = (
-            cls.client.fut_get(
+            self.client.fut_get(
                 api.post_comments_url_pattern.format(post_id=post_id),
-                params={'after': page * cls.comments_per_page})
+                params={'after': page * self.comments_per_page})
             for page in range(pages)
         )
         return comments_futures
 
-    @classmethod
-    def get_comments_serial(cls, post_id):
+    def get_comments_serial(self, post_id):
         comments_url = api.post_comments_url_pattern.format(post_id=post_id)
 
         params = {}
         comments = []
         while True:
-            _comments = Post.client.get(comments_url, params=params)
+            _comments = self.client.get(comments_url, params=params)
             if len(_comments) == 0:
                 break
             comments += _comments
             params['after'] = _comments[-1]['floor']
 
         return comments
+
+    def _initial_metadata(self, metadata):
+        if metadata is None:
+            return
+        metadata = metadata if isinstance(metadata, list) else [metadata]
+        self.use_only_id = type(metadata[0]) is int
+        self.ids = metadata if self.use_only_id else [m['id'] for m in metadata]
+        self.metas = metadata if not self.use_only_id else None
 
 
 class PostsResult:
