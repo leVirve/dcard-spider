@@ -5,20 +5,20 @@ from six.moves import zip_longest
 
 from dcard import api
 from dcard.manager import ContentParser, Downloader
-from dcard.utils import Client, flatten_lists
+from dcard.utils import flatten_lists
 
-logger = logging.getLogger('dcard')
+logger = logging.getLogger(__name__)
 
 
 class Post:
 
     comments_per_page = 30
 
-    def __init__(self, metadata=None):
+    def __init__(self, metadata=None, client=None):
         self.use_only_id = False
         self.ids = []
         self.metas = None
-        self.client = Client()
+        self.client = client
         self._initial_metadata(metadata)
 
     def __call__(self, value):

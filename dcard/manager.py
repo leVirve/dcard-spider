@@ -6,7 +6,7 @@ import logging
 
 from dcard.utils import Client
 
-logger = logging.getLogger('dcard')
+logger = logging.getLogger(__name__)
 
 
 reg_images = \

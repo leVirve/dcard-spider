@@ -4,9 +4,9 @@ from __future__ import unicode_literals, absolute_import
 import logging
 
 from dcard import api
-from dcard.utils import Client, flatten_lists
+from dcard.utils import flatten_lists
 
-logger = logging.getLogger('dcard')
+logger = logging.getLogger(__name__)
 
 
 class Forum:
@@ -14,10 +14,10 @@ class Forum:
     metas_per_page = 30
     infinite_page = -1
 
-    def __init__(self, name=None):
+    def __init__(self, name=None, client=None):
         self.name = None
         self.posts_meta_url = None
-        self.client = Client()
+        self.client = client
         self._initial_forum(name)
 
     def __call__(self, name):

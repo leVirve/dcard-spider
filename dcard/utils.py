@@ -11,29 +11,15 @@ from requests.packages.urllib3.util.retry import Retry
 from requests.exceptions import RetryError
 from requests_futures.sessions import FuturesSession
 
-logger = logging.getLogger('dcard')
+logger = logging.getLogger(__name__)
 
 
-class _Singleton(type):
-
-    _instances = {}
-
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super(_Singleton, cls).__call__(*args, **kwargs)
-        return cls._instances[cls]
-
-
-class Singleton(_Singleton('SingletonMeta', (object,), {})):
-    pass
-
-
-class Client(Singleton):
+class Client:
 
     def __init__(self, workers=8):
         self.fut_session = FuturesSession(max_workers=workers)
         self.req_session = requests.Session()
-        self.thread_pool = Pool(processes=workers) # how to recycle?
+        self.thread_pool = Pool(processes=workers)
         self.retries = Retry(
             total=5,
             backoff_factor=0.1,
