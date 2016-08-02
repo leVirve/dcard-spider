@@ -1,6 +1,9 @@
 import re
 import json
 import codecs
+from six.moves import http_client as httplib
+
+from requests.exceptions import RetryError
 
 
 post_metas_requests = 0
@@ -42,7 +45,22 @@ class MockedRequest:
                 elif i == 4:
                     json.comments_case = True
                     json.start = params.get('after', 0) if params else 0
+                json.load_mockeddata()
                 return json
+        else:
+            if kwargs.get('error') == 'ValueError':
+                raise ValueError
+            elif kwargs.get('error') == 'IncompleteRead':
+                e = httplib.IncompleteRead(partial='some error here')
+                raise e
+            elif kwargs.get('error') == 'RetryError':
+                raise RetryError
+            else:
+                error_json = JsonResponse()
+                error_json.result = {'error': 'Not found Ya'}
+                error_json.status_code = 404
+
+            return error_json
 
 
 class JsonResponse:
@@ -51,11 +69,12 @@ class JsonResponse:
         self.f = codecs.open(path, 'r', 'utf-8') if path else path
         self.ok = ok
         self.comments_case = False
+        self.result = []
 
     def result(self):
         return self
 
-    def json(self):
+    def load_mockeddata(self):
         result = json.load(self.f) if self.f else []
         self.f.close() if self.f else None
 
@@ -63,8 +82,10 @@ class JsonResponse:
             start = self.start
             end = start + 30 if start + 30 < len(result) else len(result)
             result = result[start:end]
+        self.result = result
 
-        return result
+    def json(self):
+        return self.result
 
 
 class StreamResponse:

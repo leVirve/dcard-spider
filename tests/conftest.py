@@ -3,6 +3,7 @@ import datetime
 import pytest
 
 from dcard import Dcard
+from dcard.utils import Client
 
 from tests.mocked import MockedRequest
 
@@ -25,3 +26,8 @@ def boundary_date():
 @pytest.fixture(scope='module')
 def metas(dcard):
     return dcard.forums('testfixure').get_metas()
+
+
+@pytest.fixture(scope='module')
+def client():
+    return Client()

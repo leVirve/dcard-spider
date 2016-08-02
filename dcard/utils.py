@@ -47,12 +47,13 @@ class Client(Singleton):
             if isinstance(data, dict) and data.get('error'):
                 raise ServerResponsedError
             return data
-        except ValueError:
+        except ValueError as e:
             man_retry = kwargs.get('man_retry', 1)
             if man_retry > 5:
                 return {}
             logger.error('when get {}, error {}; and retry#{}...'.format(url, e, man_retry))
-            return self.get(url, man_retry=man_retry + 1, **kwargs)
+            kwargs['man_retry'] = man_retry + 1
+            return self.get(url, **kwargs)
         except ServerResponsedError:
             logger.error('when get {}, error {}; status_code {}'.format(
                 url, data, response.status_code))
@@ -61,7 +62,7 @@ class Client(Singleton):
             logger.error('when get {}, error {}; partial: {}'.format(url, e, e.partial))
             return {}  # or should we return `e.partial` ?
         except RetryError as e:
-            logger.error('when get {}, error {}'.format(url, e))
+            logger.error('when get {}, retry error from requests {}'.format(url, e))
 
     def get_stream(self, url, **kwargs):
         return self.req_session.get(url, stream=True, **kwargs)
@@ -75,11 +76,6 @@ class Client(Singleton):
 
 def flatten_lists(meta_lists):
     return list(itertools.chain.from_iterable(meta_lists))
-
-
-def chunks(elements, chunck_size=30):
-    for i in range(0, len(elements), chunck_size):
-        yield elements[i:i+chunck_size]
 
 
 class ServerResponsedError(Exception):
