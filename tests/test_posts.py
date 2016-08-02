@@ -76,8 +76,13 @@ class TestPostsResult:
         assert len(posts) == 1
         assert posts[0] is not None
 
-    def test_parse_resourses(self, dcard):
+    def test_parse_resourses_in_content(self, dcard):
         posts = dcard.posts(9487).get(comments=False, links=False)
+        resources = posts.parse_resources()
+        assert len(resources) > 0
+
+    def test_parse_resourses_in_content_and_comments(self, dcard):
+        posts = dcard.posts(9487).get(links=False)
         resources = posts.parse_resources()
         assert len(resources) > 0
 

@@ -97,12 +97,9 @@ class ContentParser:
             comments = post.get('comments') or []
             imgur_files = ContentParser._parse_images(article)
             for comment in comments:
-                imgur_files += ContentParser._parse_images(comment['content'])
+                imgur_files += ContentParser._parse_images(comment.get('content', ''))
             del post['content']
             return (post, imgur_files)
-
-        if isinstance(self.results, dict):
-            return [parse(self.results)]
 
         logger.info('[ContentParser] takes hand')
         resoures = [parse(post) for post in self.results]

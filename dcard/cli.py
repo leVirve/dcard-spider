@@ -34,14 +34,10 @@ def main():
 
 def download(args):
 
-    global likes_thesh
-    likes_thesh = 0
-
     def collect_ids(metas):
         return [meta['id'] for meta in metas if meta['likeCount'] >= likes_thesh]
 
-    if args.likes_threshold:
-        likes_thesh = args.likes_threshold
+    likes_thesh = args.likes_threshold if args.likes_threshold else 0
 
     dcard = Dcard()
 
