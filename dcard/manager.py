@@ -3,6 +3,7 @@ from __future__ import absolute_import, unicode_literals
 import os
 import re
 import logging
+from multiprocessing.dummy import Pool
 
 from dcard.utils import Client
 
@@ -58,7 +59,9 @@ class Downloader:
             self.done_resources += len(urls)
             tasks += [(self._gen_filepath(meta, url), url) for url in urls]
 
-        results = client.parallel_tasks(download, tasks).get()
+        with Pool(8) as pool:
+            async_results = pool.map_async(download, tasks)
+            results = async_results.get()
         logger.info('[Downloader] finish {0} items!'.format(len(results)))
         return results
 

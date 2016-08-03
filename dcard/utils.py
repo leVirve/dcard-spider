@@ -2,7 +2,6 @@
 
 import logging
 import itertools
-from multiprocessing.dummy import Pool
 from six.moves import http_client as httplib
 
 import requests
@@ -19,7 +18,6 @@ class Client:
     def __init__(self, workers=8):
         self.fut_session = FuturesSession(max_workers=workers)
         self.req_session = requests.Session()
-        self.thread_pool = Pool(processes=workers)
         self.retries = Retry(
             total=5,
             backoff_factor=0.1,
@@ -55,9 +53,6 @@ class Client:
 
     def fut_get(self, url, **kwargs):
         return self.fut_session.get(url, **kwargs)
-
-    def parallel_tasks(self, function, tasks):
-        return self.thread_pool.map_async(function, tasks)
 
 
 def flatten_lists(meta_lists):
