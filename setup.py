@@ -24,7 +24,7 @@ setup(
     install_requires=[
         'six',
         'requests',
-        'requests-futures',
+        'grequests',
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',
