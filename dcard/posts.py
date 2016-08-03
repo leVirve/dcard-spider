@@ -5,7 +5,7 @@ from six.moves import zip_longest
 
 from dcard import api
 from dcard.manager import ContentParser, Downloader
-from dcard.utils import flatten_lists
+from dcard.utils import flatten_lists, gmap
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +35,7 @@ class Post:
 
     def get_content(self, post_ids):
         content_futures = (
-            self.client.fut_get(
+            self.client.grequest(
                 api.post_url_pattern.format(post_id=post_id))
             for post_id in post_ids
         )
@@ -43,7 +43,7 @@ class Post:
 
     def get_links(self, post_ids):
         links_futures = (
-            self.client.fut_get(
+            self.client.grequest(
                 api.post_links_url_pattern.format(post_id=post_id))
             for post_id in post_ids
         )
@@ -61,7 +61,7 @@ class Post:
     def get_comments_parallel(self, post_id, comments_count):
         pages = -(-comments_count // self.comments_per_page)
         comments_futures = (
-            self.client.fut_get(
+            self.client.grequest(
                 api.post_comments_url_pattern.format(post_id=post_id),
                 params={'after': page * self.comments_per_page})
             for page in range(pages)
@@ -112,18 +112,18 @@ class PostsResult:
 
     def reformat(self, bundle, callback):
         for content, links, comments in zip_longest(
-            bundle['content'], bundle['links'], bundle['comments']
+            gmap(bundle['content']), gmap(bundle['links']), bundle['comments']
         ):
             post = {}
-            post.update(content.result().json()) if content else None
+            post.update(content.json()) if content else None
             post.update({
-                'links': links.result().json() if links else None,
+                'links': links.json() if links else None,
                 'comments': self.extract_comments(comments)
             })
             yield post
 
     def extract_comments(self, comments):
-        return flatten_lists([cmts.result().json() for cmts in comments]) \
+        return flatten_lists([cmts.json() for cmts in gmap(comments)]) \
             if self.massive and comments else comments
 
     def parse_resources(self):

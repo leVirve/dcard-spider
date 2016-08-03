@@ -5,10 +5,10 @@ import itertools
 from six.moves import http_client as httplib
 
 import requests
+import grequests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 from requests.exceptions import RetryError
-from requests_futures.sessions import FuturesSession
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +16,9 @@ logger = logging.getLogger(__name__)
 class Client:
 
     def __init__(self, workers=8):
-        self.fut_session = FuturesSession(max_workers=workers)
+        '''
+        session = grequests.AsyncRequest(session=session)
+        '''
         self.req_session = requests.Session()
         self.retries = Retry(
             total=5,
@@ -51,12 +53,16 @@ class Client:
     def get_stream(self, url, **kwargs):
         return self.req_session.get(url, stream=True, **kwargs)
 
-    def fut_get(self, url, **kwargs):
-        return self.fut_session.get(url, **kwargs)
+    def grequest(self, url, **kwargs):
+        return grequests.get(url, **kwargs)
 
 
 def flatten_lists(meta_lists):
     return list(itertools.chain.from_iterable(meta_lists))
+
+
+def gmap(greqs):
+    return grequests.map(greqs)
 
 
 class ServerResponsedError(Exception):
