@@ -1,3 +1,5 @@
+from dcard import add_handles_on_logger
+
 
 class TestClient:
 
@@ -20,3 +22,9 @@ class TestClient:
     def test_get_stream(self, client):
         resp = client.get_stream('https://test-for-get-stream')
         assert resp.ok
+
+
+class TestDcard:
+
+    def test_dcard_logger_handlers(self):
+        add_handles_on_logger()
