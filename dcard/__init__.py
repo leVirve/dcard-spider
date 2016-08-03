@@ -1,18 +1,14 @@
 from __future__ import absolute_import
 
 import logging
+from logging import NullHandler
+
 from dcard.dcard import Dcard  # noqa
 
 
 __version__ = '0.2.9'
+__author__ = 'Salas leVirve'
 
-
-try:
-    from logging import NullHandler
-except ImportError:
-    class NullHandler(logging.Handler):
-        def emit(self, record):
-            pass
 
 logging.getLogger(__name__).addHandler(NullHandler())
 
