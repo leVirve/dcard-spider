@@ -7,8 +7,6 @@ python:
   - "3.5"
   - "3.5-dev"
   - "nightly"
-  - "pypy"
-  - "pypy3"
 
 before_install:
   - pip install pytest-cov
