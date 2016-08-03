@@ -83,7 +83,7 @@ class Post:
         return comments
 
     def _initial_metadata(self, metadata):
-        if metadata is None:
+        if not metadata:
             return
         metadata = metadata if isinstance(metadata, list) else [metadata]
         self.use_only_id = type(metadata[0]) is int
