@@ -71,10 +71,10 @@ class FutureRequest:
         response = None
         try:
             response = self.future.result()
-            print(response.json())
             return response.json()
         except ValueError as e:
-            logger.error('when get {}, error {}'.format(response.url, e))
+            logger.error('when get <{}> {}, error {}'
+                         .format(response.status_code, response.url, e))
             return {}
         except Exception as e:
             logger.error('when get {}, error {}'.format(response.url, e))

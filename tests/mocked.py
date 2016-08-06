@@ -69,6 +69,7 @@ class JsonResponse:
     def __init__(self, path=None, ok=True, error=None):
         self.f = codecs.open(path, 'r', 'utf-8') if path else path
         self.ok = ok
+        self.status_code = 200
         self.comments_case = False
         self.result = []
         self.error = error
