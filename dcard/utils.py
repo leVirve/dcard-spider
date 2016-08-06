@@ -52,7 +52,28 @@ class Client:
         return self.req_session.get(url, stream=True, **kwargs)
 
     def fut_get(self, url, **kwargs):
-        return self.fut_session.get(url, **kwargs)
+        return FutureRequest(self, self.fut_session.get(url, **kwargs))
+
+
+class FutureRequest:
+
+    def __init__(self, caller, future):
+        self.future = future
+        self.ok = None
+        self.caller = caller
+        self.manual_retry = 0
+
+    def json(self):
+        try:
+            response = self.future.result()
+
+            self.ok = response.ok
+            data = response.json()
+        except ValueError as e:
+            logger.error('when get {}, error {}'.format(response.url, e))
+            data = {}
+        finally:
+            return data
 
 
 def flatten_lists(meta_lists):

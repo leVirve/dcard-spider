@@ -25,14 +25,12 @@ class TestPosts:
 
     def test_get_content(self, dcard):
         futs = dcard.posts.get_content([9487])
-        future = list(futs)[0]
-        result = future.result()
+        result = list(futs)[0]
         assert isinstance(result.json(), dict)
 
     def test_get_links(self, dcard):
         futs = dcard.posts.get_links([9487])
-        future = list(futs)[0]
-        result = future.result()
+        result = list(futs)[0]
         assert isinstance(result.json(), list)
 
     def test_get_comments_serial(self, dcard):
@@ -43,8 +41,7 @@ class TestPosts:
     def test_get_comments_parallel(self, dcard, metas):
         comments_count = 87
         futs = dcard.posts.get_comments_parallel(9487, comments_count)
-        future = list(futs)[0]
-        result = future.result()
+        result = list(futs)[0]
         assert isinstance(result.json(), list)
 
     def test_get_post_bundle(self, dcard):
