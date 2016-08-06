@@ -21,11 +21,15 @@ parser.add_argument(
 parser.add_argument(
     '-F', '--flatten', action='store_true', help='Option for flattening folders')
 parser.add_argument(
+    '-v', '--verbose', action='store_true', help='Logging verbose information')
+parser.add_argument(
     '-V', '--version', action='version', version=dcard.__version__)
 
 
-def main():
-    args = parser.parse_args()
+def main(args=None):
+    args = args or parser.parse_args()
+    if args.verbose:
+        dcard.add_handles_on_logger()
     if args.mode == 'download':
         if not (args.forum or args.pages):
             parser.error('No action requested, add --forum or --pages')

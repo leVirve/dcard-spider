@@ -1,7 +1,16 @@
-from dcard.cli import parser, download
+import os
+
+from dcard.cli import parser, main, download
 
 
 class TestCli:
+
+    def test_verbose_log(self):
+        argv = 'download -f funny -n 15 -v'.split()
+        args = parser.parse_args(argv)
+
+        main(args)
+        assert os.path.exists('dcard.log')
 
     def test_download_basic(self):
         argv = 'download -f funny -n 15'.split()
