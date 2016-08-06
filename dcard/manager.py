@@ -79,7 +79,11 @@ class Downloader:
         return filepath
 
     def _gen_full_folder(self, meta):
+
+        # clean garbage text in title !
         safe_title = re.sub('[\?\\\\/><:"|\*\.]', '', meta['title']).strip()
+        safe_title = ''.join([c for c in safe_title if ord(c) > 0x1f])
+
         meta['folder_name'] = safe_title
         folder = self.subfolder_pattern.format(**meta)
         return self.resources_folder + '/' + folder
