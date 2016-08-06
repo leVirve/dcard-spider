@@ -8,7 +8,7 @@ def readme():
 setup(
     name='dcard-spider',
     version='0.2.9',
-    url='http://github.coom/leVirve/dcard-spider',
+    url='http://github.com/leVirve/dcard-spider',
     description='A spider for Dcard through its newest API.',
     long_description=readme(),
     author='Salas leVirve',
@@ -18,7 +18,7 @@ setup(
     packages=['dcard'],
     zip_safe=False,
     keywords='Dcard crawler spider',
-    entry_points = {
+    entry_points={
         'console_scripts': ['dcard=dcard.cli:main'],
     },
     install_requires=[
