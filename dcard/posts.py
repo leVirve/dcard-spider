@@ -120,7 +120,8 @@ class PostsResult:
                 'links': links.json() if links else None,
                 'comments': self.extract_comments(comments)
             })
-            yield post
+            if post:
+                yield post
 
     def extract_comments(self, comments):
         return flatten_lists([cmts.json() for cmts in comments]) \

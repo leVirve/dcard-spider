@@ -35,18 +35,23 @@ class Client:
             man_retry = kwargs.get('man_retry', 1)
             if man_retry > 5:
                 return {}
-            logger.error('when get {}, error {}; and retry#{}...'.format(url, e, man_retry))
+            logger.error(
+                'when get {}, error {}; and retry#{}...'
+                .format(url, e, man_retry))
             kwargs['man_retry'] = man_retry + 1
             return self.get(url, **kwargs)
         except ServerResponsedError:
-            logger.error('when get {}, error {}; status_code {}'.format(
-                url, data, response.status_code))
+            logger.error(
+                'when get {}, error {}; status_code {}'
+                .format(url, data, response.status_code))
             return {}
         except httplib.IncompleteRead as e:
-            logger.error('when get {}, error {}; partial: {}'.format(url, e, e.partial))
+            logger.error(
+                'when get {}, error {}; partial: {}'.format(url, e, e.partial))
             return {}  # or should we return `e.partial` ?
         except RetryError as e:
-            logger.error('when get {}, retry error from requests {}'.format(url, e))
+            logger.error(
+                'when get {}, retry error from requests {}'.format(url, e))
 
     def get_stream(self, url, **kwargs):
         return self.req_session.get(url, stream=True, **kwargs)
@@ -59,21 +64,21 @@ class FutureRequest:
 
     def __init__(self, caller, future):
         self.future = future
-        self.ok = None
         self.caller = caller
         self.manual_retry = 0
 
     def json(self):
+        response = None
         try:
             response = self.future.result()
-
-            self.ok = response.ok
-            data = response.json()
+            print(response.json())
+            return response.json()
         except ValueError as e:
             logger.error('when get {}, error {}'.format(response.url, e))
-            data = {}
-        finally:
-            return data
+            return {}
+        except Exception as e:
+            logger.error('when get {}, error {}'.format(response.url, e))
+            return {}
 
 
 def flatten_lists(meta_lists):
