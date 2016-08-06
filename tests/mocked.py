@@ -55,21 +55,24 @@ class MockedRequest:
                 raise e
             elif kwargs.get('error') == 'RetryError':
                 raise RetryError
+            elif kwargs.get('resp_error'):
+                return JsonResponse(error=kwargs.get('resp_error'))
             else:
                 error_json = JsonResponse()
                 error_json.result = {'error': 'Not found Ya'}
                 error_json.status_code = 404
-
-            return error_json
+                return error_json
 
 
 class JsonResponse:
 
-    def __init__(self, path=None, ok=True):
+    def __init__(self, path=None, ok=True, error=None):
         self.f = codecs.open(path, 'r', 'utf-8') if path else path
         self.ok = ok
         self.comments_case = False
         self.result = []
+        self.error = error
+        self.url = 'http://mocked.json.resp'
 
     def result(self):
         return self
@@ -85,6 +88,10 @@ class JsonResponse:
         self.result = result
 
     def json(self):
+        if self.error == 'ValueError':
+            raise ValueError
+        elif self.error:
+            raise Exception
         return self.result
 
 
