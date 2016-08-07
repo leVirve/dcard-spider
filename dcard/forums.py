@@ -36,20 +36,20 @@ class Forum:
             callback=None):
         logger.info('<%s> 開始取得看板內文章資訊' % self.name)
 
-        paged_metas = self._get_paged_metas(sort, num, timebound)
+        paged_metas = self.get_paged_metas(sort, num, timebound)
 
-        buff = flatten_lists((metas for metas in paged_metas))
+        buff = flatten_lists(metas for metas in paged_metas)
         results = callback(buff) if callback else buff
 
         logger.info('<%s> 資訊蒐集完成，共%d筆' % (self.name, len(buff)))
         return results
 
-    def _get_paged_metas(self, sort, num, timebound=''):
+    def get_paged_metas(self, sort, num, timebound=''):
         params = {'popular': False} if sort == 'new' else {}
-        pages = -(-num // self.metas_per_page) if num >= 0 else self.infinite_page
+        pages = -(-num // self.metas_per_page)
 
-        def refine_metas(metas):
-            if num and page == pages:
+        def filter_metas(metas):
+            if num >= 0 and page == pages:
                 metas = metas[:num - (pages - 1) * self.metas_per_page]
             if timebound:
                 metas = [m for m in metas if m['updatedAt'] > timebound]
@@ -57,21 +57,21 @@ class Forum:
 
         def eager_for_metas(bundle):
             page, metas = bundle
-            if page == pages + 1:
+            if num >= 0 and page == pages + 1:
                 return False
             if len(metas) == 0:
                 logger.warning('[%s] 已到最末頁，第%d頁!' % (self.name, page))
             return len(metas) != 0
 
-        def get_metas():
+        def get_single_page_metas():
             while True:
                 yield self.client.get(self.posts_meta_url, params=params)
 
-        paged_metas = zip(count(start=1), get_metas())
+        paged_metas = zip(count(start=1), get_single_page_metas())
 
         for page, metas in takewhile(eager_for_metas, paged_metas):
             params['before'] = metas[-1]['id']
-            metas = refine_metas(metas)
+            metas = filter_metas(metas)
             if len(metas) == 0:
                 return
             yield metas
