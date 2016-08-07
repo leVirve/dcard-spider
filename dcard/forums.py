@@ -2,6 +2,7 @@
 from __future__ import unicode_literals, absolute_import
 
 import logging
+from itertools import takewhile, count
 
 from dcard import api
 from dcard.utils import flatten_lists
@@ -47,30 +48,32 @@ class Forum:
         params = {'popular': False} if sort == 'new' else {}
         pages = -(-num // self.metas_per_page) if num >= 0 else self.infinite_page
 
-        def approved_metas(metas):
+        def refine_metas(metas):
             if num and page == pages:
                 metas = metas[:num - (pages - 1) * self.metas_per_page]
-
             if timebound:
                 metas = [m for m in metas if m['updatedAt'] > timebound]
-
             return metas
 
-        page = 0
-        while page != pages:
-            page += 1
-            metas = self.client.get(self.posts_meta_url, params=params)
-
+        def eager_for_metas(bundle):
+            page, metas = bundle
+            if page == pages + 1:
+                return False
             if len(metas) == 0:
                 logger.warning('[%s] 已到最末頁，第%d頁!' % (self.name, page))
-                return
+            return len(metas) != 0
 
+        def get_metas():
+            while True:
+                yield self.client.get(self.posts_meta_url, params=params)
+
+        paged_metas = zip(count(start=1), get_metas())
+
+        for page, metas in takewhile(eager_for_metas, paged_metas):
             params['before'] = metas[-1]['id']
-
-            metas = approved_metas(metas)
+            metas = refine_metas(metas)
             if len(metas) == 0:
                 return
-
             yield metas
 
     def _initial_forum(self, name):
