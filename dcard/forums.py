@@ -26,7 +26,7 @@ class Forum:
         return self
 
     def get(self, no_school=False):
-        forums = self.client.get(api.forums_url)
+        forums = self.client.get_json(api.forums_url)
         if no_school:
             return [forum for forum in self._extract_general(forums)]
         return forums
@@ -65,7 +65,7 @@ class Forum:
 
         def get_single_page_metas():
             while True:
-                yield self.client.get(self.posts_meta_url, params=params)
+                yield self.client.get_json(self.posts_meta_url, params=params)
 
         paged_metas = zip(count(start=1), get_single_page_metas())
 

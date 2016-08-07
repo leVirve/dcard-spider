@@ -74,7 +74,7 @@ class Post:
         params = {}
         comments = []
         while True:
-            _comments = self.client.get(comments_url, params=params)
+            _comments = self.client.get_json(comments_url, params=params)
             if len(_comments) == 0:
                 break
             comments += _comments

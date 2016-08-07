@@ -24,7 +24,7 @@ class Client:
             status_forcelist=[500, 502, 503, 504])
         self.req_session.mount('https://', HTTPAdapter(max_retries=self.retries))
 
-    def get(self, url, **kwargs):
+    def _get(self, url, **kwargs):
         try:
             response = self.req_session.get(url, **kwargs)
             data = response.json()
@@ -39,7 +39,7 @@ class Client:
                 'when get {}, error {}; and retry#{}...'
                 .format(url, e, man_retry))
             kwargs['man_retry'] = man_retry + 1
-            return self.get(url, **kwargs)
+            return self._get(url, **kwargs)
         except ServerResponsedError:
             logger.error(
                 'when get {}, error {}; status_code {}'
@@ -58,6 +58,10 @@ class Client:
 
     def fut_get(self, url, **kwargs):
         return FutureRequest(self, self.fut_session.get(url, **kwargs))
+
+    def get_json(self, url, **kwargs):
+        request = self.fut_get(url, **kwargs)
+        return request.json()
 
 
 class FutureRequest:
