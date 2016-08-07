@@ -65,4 +65,4 @@ def download(args):
           if all(status) else '出了點錯下載不完全喔')
     print('Finish in {0:.5f} sec(s).'.format(time.time() - start_time))
 
-    return all(status)
+    return all(status), fails
