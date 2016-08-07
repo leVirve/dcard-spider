@@ -64,7 +64,7 @@ class Downloader:
 
         status = [ok for ok, _ in results]
         fails = [src for ok, src in results if not ok]
-        logger.info('[Downloader] finish {0} items!'.format(len(status)))
+        logger.info('[Downloader] finish %d items!', len(status))
         return status, fails
 
     def _gen_filepath(self, meta, url):
@@ -112,7 +112,7 @@ class ContentParser:
 
         logger.info('[ContentParser] takes hand')
         resoures = [parse(post) for post in self.results]
-        logger.info('[ContentParser] collects {0} resources'.format(len(resoures)))
+        logger.info('[ContentParser] collects %d resources', len(resoures))
         return resoures
 
     @staticmethod

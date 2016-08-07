@@ -36,14 +36,14 @@ class Forum:
     def get_metas(
             self, num=30, sort='new', timebound=None,
             callback=None):
-        logger.info('<%s> 開始取得看板內文章資訊' % self.name)
+        logger.info('<%s> 開始取得看板內文章資訊', self.name)
 
         paged_metas = self.get_paged_metas(sort, num, timebound)
 
         buff = flatten_lists(metas for metas in paged_metas)
         results = callback(buff) if callback else buff
 
-        logger.info('<%s> 資訊蒐集完成，共%d筆' % (self.name, len(buff)))
+        logger.info('<%s> 資訊蒐集完成，共%d筆', self.name, len(buff))
         return results
 
     def get_paged_metas(self, sort, num, timebound=''):
@@ -62,7 +62,7 @@ class Forum:
             if num >= 0 and page == pages + 1:
                 return False
             if len(metas) == 0:
-                logger.warning('[%s] 已到最末頁，第%d頁!' % (self.name, page))
+                logger.warning('[%s] 已到最末頁，第%d頁!', self.name, page)
             return len(metas) != 0
 
         def get_single_page_metas():

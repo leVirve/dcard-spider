@@ -56,25 +56,23 @@ class FutureRequest:
                 raise ServerResponsedError
             return data
         except ValueError as e:
-            logger.error('when get <{}> {}, error {} (retry#{})'
-                         .format(response.status_code, response.url, e,
-                                 self.retries))
+            logger.error('when get <%d> %s, error %s (retry#%d)',
+                         response.status_code, response.url, e, self.retries)
             return {} if self.retries <= self.max_retries else \
                 self.caller.get_json(response.url, retries=self.retries + 1)
         except ServerResponsedError:
-            logger.error('when get <{}> {}, response: {}'
-                         .format(response.status_code, response.url, data))
+            logger.error('when get <%d> %s, response: %s',
+                         response.status_code, response.url, data)
             return {}
         except httplib.IncompleteRead as e:
-            logger.error('when get {}, error {}; partial: {}'
-                         .format(self.url, e, e.partial))
+            logger.error('when get %s, error %s; partial: %s',
+                         self.url, e, e.partial)
             return {}  # or shall we return `e.partial` ?
         except RetryError as e:
-            logger.error('when get {}, retry error occurs. {}'
-                         .format(self.url, e))
+            logger.error('when get %s, retry error occurs. %s', self.url, e)
             return {}
         except Exception as e:
-            logger.error('when get {}, error {}'.format(response.url, e))
+            logger.error('when get %s, error %s', response.url, e)
             return {}
 
 

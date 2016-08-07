@@ -95,11 +95,11 @@ class PostsResult:
 
     downloader = Downloader()
 
-    def __init__(self, bundle, massive=True, callback=None):
+    def __init__(self, bundle, massive=True):
         logger.info('[PostResult] takes hand.')
         self.massive = massive
-        self.results = list(self.reformat(bundle, callback))
-        logger.info('[PostResult] {} posts processed.'.format(len(self.results)))
+        self.results = list(self.reformat(bundle))
+        logger.info('[PostResult] %d posts processed.', len(self.results))
 
     def __len__(self):
         return len(self.results)
@@ -110,7 +110,7 @@ class PostsResult:
     def __getitem__(self, key):
         return self.results[int(key)]
 
-    def reformat(self, bundle, callback):
+    def reformat(self, bundle):
         for content, links, comments in zip_longest(
             bundle['content'], bundle['links'], bundle['comments']
         ):
