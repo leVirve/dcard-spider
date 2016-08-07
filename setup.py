@@ -7,7 +7,7 @@ def readme():
 
 setup(
     name='dcard-spider',
-    version='0.2.9',
+    version='0.2.11',
     url='http://github.com/leVirve/dcard-spider',
     description='A spider for Dcard through its newest API.',
     long_description=readme(),
