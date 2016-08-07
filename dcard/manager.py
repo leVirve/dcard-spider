@@ -26,15 +26,13 @@ client = Client()
 def download(task):
     filepath, src = task
     if os.path.exists(filepath):
-        return True
+        return True, src
     response = client.get_stream(src)
     if response.ok:
         with open(filepath, 'wb') as stream:
             for chunk in response.iter_content(chunk_size=1024):
                 stream.write(chunk)
-    else:
-        print('%s can not download.' % src)
-    return response.ok
+    return (response.ok, src)
 
 
 class Downloader:
@@ -60,12 +58,14 @@ class Downloader:
             self.done_resources += len(urls)
             tasks += [(self._gen_filepath(meta, url), url) for url in urls]
 
-        # results = list(new_download(tasks))
         with contextlib.closing(Pool(8)) as pool:
             async_results = pool.map_async(download, tasks)
             results = async_results.get()
-        logger.info('[Downloader] finish {0} items!'.format(len(results)))
-        return results
+
+        status = [ok for ok, _ in results]
+        fails = [src for ok, src in results if not ok]
+        logger.info('[Downloader] finish {0} items!'.format(len(status)))
+        return status, fails
 
     def _gen_filepath(self, meta, url):
         folder = self._gen_full_folder(meta)

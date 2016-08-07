@@ -31,15 +31,15 @@ def main(args=None):
     if args.verbose:
         dcard.add_handles_on_logger()
     if args.mode == 'download':
-        if not (args.forum or args.pages):
-            parser.error('No action requested, add --forum or --pages')
+        if not (args.forum or args.number):
+            parser.error('No action requested, add --forum or --number')
         download(args)
 
 
 def download(args):
 
-    def collect_ids(metas):
-        return [meta['id'] for meta in metas if meta['likeCount'] >= likes_thesh]
+    def metas_filter(metas):
+        return [meta for meta in metas if meta['likeCount'] >= likes_thesh]
 
     likes_thesh = args.likes_threshold if args.likes_threshold else 0
 
@@ -47,10 +47,10 @@ def download(args):
 
     start_time = time.time()
 
-    ids = dcard \
+    metas = dcard \
         .forums(args.forum) \
-        .get_metas(num=args.number, callback=collect_ids)
-    posts = dcard.posts(ids).get(comments=False, links=False)
+        .get_metas(num=args.number, callback=metas_filter)
+    posts = dcard.posts(metas).get(comments=False, links=False)
 
     if args.flatten:
         posts.downloader.subfolder_pattern = '[{likeCount}推] {id}-{folder_name}'
@@ -59,7 +59,7 @@ def download(args):
         posts.downloader.resources_folder = args.output
 
     resources = posts.parse_resources()
-    status = posts.download(resources)
+    status, fails = posts.download(resources)
 
     print('成功下載 %d items！' % posts.downloader.done_resources
           if all(status) else '出了點錯下載不完全喔')

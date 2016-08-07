@@ -86,5 +86,6 @@ class TestPostsResult:
     def test_download_resourses(self, dcard):
         posts = dcard.posts(9487).get(comments=False, links=False)
         resources = posts.parse_resources()
-        status = posts.download(resources)
+        status, fails = posts.download(resources)
         assert all(status)
+        assert len(fails) == 0

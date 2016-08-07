@@ -1,5 +1,7 @@
 import os
 
+import pytest
+
 from dcard.cli import parser, main, download
 
 
@@ -11,6 +13,13 @@ class TestCli:
 
         main(args)
         assert os.path.exists('dcard.log')
+
+    def test_download_but_no_params(self):
+        argv = 'download'.split()
+        args = parser.parse_args(argv)
+
+        with pytest.raises(SystemExit):
+            main(args)
 
     def test_download_basic(self):
         argv = 'download -f funny -n 15'.split()
