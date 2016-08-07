@@ -16,48 +16,20 @@ logger = logging.getLogger(__name__)
 class Client:
 
     def __init__(self, workers=8):
-        self.fut_session = FuturesSession(max_workers=workers)
-        self.req_session = requests.Session()
-        self.retries = Retry(
+        retries = Retry(
             total=5,
             backoff_factor=0.1,
             status_forcelist=[500, 502, 503, 504])
-        self.req_session.mount('https://', HTTPAdapter(max_retries=self.retries))
-
-    def _get(self, url, **kwargs):
-        try:
-            response = self.req_session.get(url, **kwargs)
-            data = response.json()
-            if isinstance(data, dict) and data.get('error'):
-                raise ServerResponsedError
-            return data
-        except ValueError as e:
-            man_retry = kwargs.get('man_retry', 1)
-            if man_retry > 5:
-                return {}
-            logger.error(
-                'when get {}, error {}; and retry#{}...'
-                .format(url, e, man_retry))
-            kwargs['man_retry'] = man_retry + 1
-            return self._get(url, **kwargs)
-        except ServerResponsedError:
-            logger.error(
-                'when get {}, error {}; status_code {}'
-                .format(url, data, response.status_code))
-            return {}
-        except httplib.IncompleteRead as e:
-            logger.error(
-                'when get {}, error {}; partial: {}'.format(url, e, e.partial))
-            return {}  # or should we return `e.partial` ?
-        except RetryError as e:
-            logger.error(
-                'when get {}, retry error from requests {}'.format(url, e))
+        self.session = requests.Session()
+        self.session.mount('https://', HTTPAdapter(max_retries=retries))
+        self.fut_session = FuturesSession(max_workers=workers, session=self.session)
 
     def get_stream(self, url, **kwargs):
-        return self.req_session.get(url, stream=True, **kwargs)
+        return self.session.get(url, stream=True, **kwargs)
 
     def fut_get(self, url, **kwargs):
-        return FutureRequest(self, self.fut_session.get(url, **kwargs))
+        return FutureRequest(
+            self, self.fut_session.get(url, **kwargs), **kwargs)
 
     def get_json(self, url, **kwargs):
         request = self.fut_get(url, **kwargs)
@@ -66,19 +38,40 @@ class Client:
 
 class FutureRequest:
 
-    def __init__(self, caller, future):
+    max_retries = 3
+
+    def __init__(self, caller, future, **kwargs):
         self.future = future
         self.caller = caller
-        self.manual_retry = 0
+        self.url = kwargs.get('url')
+        self.retries = kwargs.get('retries', 0)
+        self.response = None
 
     def json(self):
         response = None
         try:
-            response = self.future.result()
-            return response.json()
+            response = self.response = self.future.result()
+            data = response.json()
+            if type(data) is dict and data.get('error'):
+                raise ServerResponsedError
+            return data
         except ValueError as e:
-            logger.error('when get <{}> {}, error {}'
-                         .format(response.status_code, response.url, e))
+            logger.error('when get <{}> {}, error {} (retry#{})'
+                         .format(response.status_code, response.url, e,
+                                 self.retries))
+            return {} if self.retries <= self.max_retries else \
+                self.caller.get_json(response.url, retries=self.retries + 1)
+        except ServerResponsedError:
+            logger.error('when get <{}> {}, response: {}'
+                         .format(response.status_code, response.url, data))
+            return {}
+        except httplib.IncompleteRead as e:
+            logger.error('when get {}, error {}; partial: {}'
+                         .format(self.url, e, e.partial))
+            return {}  # or shall we return `e.partial` ?
+        except RetryError as e:
+            logger.error('when get {}, retry error occurs. {}'
+                         .format(self.url, e))
             return {}
         except Exception as e:
             logger.error('when get {}, error {}'.format(response.url, e))
