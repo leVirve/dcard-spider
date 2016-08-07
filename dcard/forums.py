@@ -4,6 +4,8 @@ from __future__ import unicode_literals, absolute_import
 import logging
 from itertools import takewhile, count
 
+from six.moves import zip
+
 from dcard import api
 from dcard.utils import flatten_lists
 
