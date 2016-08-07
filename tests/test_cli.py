@@ -8,7 +8,7 @@ from dcard.cli import parser, main, download
 class TestCli:
 
     def test_verbose_log(self):
-        argv = 'download -f funny -n 15 -v'.split()
+        argv = 'TEST -v'.split()
         args = parser.parse_args(argv)
 
         main(args)
