@@ -21,6 +21,12 @@ class TestCli:
         with pytest.raises(SystemExit):
             main(args)
 
+    def test_download_from_main(self):
+        argv = 'download -f funny -n 15'.split()
+        args = parser.parse_args(argv)
+
+        main(args)
+
     def test_download_basic(self):
         argv = 'download -f funny -n 15'.split()
         args = parser.parse_args(argv)
