@@ -1,7 +1,7 @@
 dcard-spider
 ============
 
-|Build Status| |Coverage Status| |PyPI|
+|Build Status| |Coverage Status| |PyPI| |Land Health|
 
 Get posts and forums resourses through Dcard practical API on website.
 
@@ -31,19 +31,19 @@ Example
 
 
     def 先過濾出標題含有作品關鍵字(metas):
-        return [meta['id'] for meta in metas if '#作品' in meta['title']]
+        return [meta for meta in metas if '#作品' in meta['title']]
 
 
     if __name__ == '__main__':
 
         dcard = Dcard()
 
-        ids = dcard.forums('photography').get_metas(num=100, callback=先過濾出標題含有作品關鍵字)
-        posts = dcard.posts(ids).get(comments=False, links=False)
+        metas = dcard.forums('photography').get_metas(num=100, callback=先過濾出標題含有作品關鍵字)
+        posts = dcard.posts(metas).get(comments=False, links=False)
 
         resources = posts.parse_resources()
 
-        status = posts.download(resources)
+        status, fails = posts.download(resources)
         print('成功下載！' if all(status) else '出了點錯下載不完全喔')
 
 .. figure:: https://raw.githubusercontent.com/leVirve/dcard-spider/master/docs/img/snapshot.png
@@ -65,6 +65,7 @@ Command line
     (options:)
             -likes      [likes threshold]
             -o          [output download folder]
+            -v          [display and logging more info during execution]
             -F          [flatten all subfolders]
             -V          [show version of dcard-spider]
 
@@ -80,7 +81,7 @@ Basic
     forums = dcard.forums.get()
     forums = dcard.forums.get(no_school=True)
 
--  取得看板文章資訊 (metadata)，一頁有30篇文章
+-  取得看板文章資訊 (metadata)
 
    -  可用 ``num`` 指定文章數量
    -  文章排序有兩種選擇: ``new`` / ``popular``
@@ -109,11 +110,12 @@ Basic
 
    -  預設每篇圖片儲存至 ``(#文章編號) 文章標題`` 為名的新資料夾
    -  ``.download()`` 會回傳每個資源下載成功與否
+   -  ``fails`` 是一串下載失敗的 URL
 
 .. code:: python
 
     resources = articles.parse_resources()
-    status = articles.download(resources)
+    status, fails = articles.download(resources)
 
 
 Advanced
@@ -190,9 +192,12 @@ Inspirations
 `Aragorn's <https://github.com/LordElessar>`_ downloader funtional request
 
 
-.. |PyPI| image:: https://img.shields.io/pypi/v/dcard-spider.svg
+.. |PyPI| image:: https://img.shields.io/pypi/v/dcard-spider.svg?style=flat-square 
     :target: https://pypi.python.org/pypi/dcard-spider
-.. |Build Status| image:: https://travis-ci.org/leVirve/dcard-spider.svg?branch=master
+.. |Build Status| image:: https://img.shields.io/travis/leVirve/dcard-spider/master.svg?style=flat-square
    :target: https://travis-ci.org/leVirve/dcard-spider
-.. |Coverage Status| image:: https://coveralls.io/repos/github/leVirve/dcard-spider/badge.svg?branch=master
+.. |Coverage Status| image:: https://img.shields.io/coveralls/leVirve/dcard-spider/master.svg?style=flat-square
    :target: https://coveralls.io/github/leVirve/dcard-spider
+.. |Land Health| image:: https://landscape.io/github/leVirve/dcard-spider/master/landscape.svg?style=flat-square
+   :target: https://landscape.io/github/leVirve/dcard-spider/master
+   :alt: Code Health
