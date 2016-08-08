@@ -15,6 +15,8 @@ parser.add_argument(
 parser.add_argument(
     '-n', '--number', type=int, help='Scan through how many posts')
 parser.add_argument(
+    '-b', '--before', type=int, help='Scan through before specified post ID')
+parser.add_argument(
     '-likes', '--likes_threshold', type=int, help='Specific minimum like counts')
 parser.add_argument(
     '-o', '--output', type=str, help='Specific folder to store the resources')
@@ -49,7 +51,7 @@ def download(args):
 
     metas = dcard \
         .forums(args.forum) \
-        .get_metas(num=args.number, callback=metas_filter)
+        .get_metas(num=args.number, before=args.before, callback=metas_filter)
     posts = dcard.posts(metas).get(comments=False, links=False)
 
     if args.flatten:

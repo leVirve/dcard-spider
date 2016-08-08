@@ -64,6 +64,7 @@ Command line
     
     (options:)
             -likes      [likes threshold]
+            -b          [specified a starting post ID]
             -o          [output download folder]
             -v          [display and logging more info during execution]
             -F          [flatten all subfolders]

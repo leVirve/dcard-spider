@@ -34,11 +34,10 @@ class Forum:
         return forums
 
     def get_metas(
-            self, num=30, sort='new', timebound=None,
-            callback=None):
+            self, num=30, sort='new', before=0, timebound=None, callback=None):
         logger.info('<%s> 開始取得看板內文章資訊', self.name)
 
-        paged_metas = self.get_paged_metas(sort, num, timebound)
+        paged_metas = self.get_paged_metas(sort, num, before, timebound)
 
         buff = flatten_lists(metas for metas in paged_metas)
         results = callback(buff) if callback else buff
@@ -46,8 +45,11 @@ class Forum:
         logger.info('<%s> 資訊蒐集完成，共%d筆', self.name, len(buff))
         return results
 
-    def get_paged_metas(self, sort, num, timebound=''):
-        params = {'popular': False} if sort == 'new' else {}
+    def get_paged_metas(self, sort, num, before, timebound=''):
+        params = {
+            'popular': sort == 'popular',
+            'before': before if before else None
+        }
         pages = -(-num // self.metas_per_page)
 
         def filter_metas(metas):
