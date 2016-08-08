@@ -20,16 +20,17 @@ class Client:
             total=5,
             backoff_factor=0.1,
             status_forcelist=[500, 502, 503, 504])
-        self.session = requests.Session()
-        self.session.mount('https://', HTTPAdapter(max_retries=retries))
-        self.fut_session = FuturesSession(max_workers=workers, session=self.session)
-
-    def get_stream(self, url, **kwargs):
-        return self.session.get(url, stream=True, **kwargs)
+        sess = requests.Session()
+        sess.mount('https://', HTTPAdapter(max_retries=retries))
+        self.session = FuturesSession(max_workers=workers, session=sess)
 
     def fut_get(self, url, **kwargs):
         return FutureRequest(
-            self, self.fut_session.get(url, **kwargs), **kwargs)
+            self, self.session.get(url, **kwargs), **kwargs)
+
+    def get_stream(self, url, **kwargs):
+        request = self.fut_get(url, stream=True, **kwargs)
+        return request.result()
 
     def get_json(self, url, **kwargs):
         request = self.fut_get(url, **kwargs)
@@ -46,6 +47,9 @@ class FutureRequest:
         self.url = kwargs.get('url')
         self.retries = kwargs.get('retries', 0)
         self.response = None
+
+    def result(self):
+        return self.future.result()
 
     def json(self):
         response = None

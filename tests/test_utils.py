@@ -34,7 +34,7 @@ class TestFutureRequest:
 
     def test_future_request_object(self, client):
         req = FutureRequest(
-                client, client.fut_session.get('https://test-for-object'))
+                client, client.session.get('https://test-for-object'))
         assert req.future
         assert req.caller
         assert req.retries == 0
@@ -42,7 +42,7 @@ class TestFutureRequest:
     def test_future_request_json_decode_error(self, client):
         req = FutureRequest(
                 client,
-                client.fut_session.get(
+                client.session.get(
                     'https://test-for-future-request',
                     resp_error='ValueError')
               )
@@ -51,7 +51,7 @@ class TestFutureRequest:
     def test_future_request_exceptions(self, client):
         req = FutureRequest(
                 client,
-                client.fut_session.get(
+                client.session.get(
                     'https://test-for-future-request',
                     resp_error=True)
               )
