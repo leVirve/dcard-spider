@@ -76,7 +76,7 @@ class FutureRequest:
             logger.error('when get %s, retry error occurs. %s', self.url, e)
             return {}
         except Exception as e:
-            logger.error('when get %s, error %s', response.url, e)
+            logger.error('error %s', e)
             return {}
 
 
