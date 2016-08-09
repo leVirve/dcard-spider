@@ -2,6 +2,7 @@
 
 import logging
 import itertools
+from multiprocessing.dummy import Pool
 from six.moves import http_client as httplib
 
 import requests
@@ -26,6 +27,7 @@ class Client:
         session = requests.Session()
         session.mount('https://', HTTPAdapter(max_retries=retries))
         self.session = session
+        self.pool = Pool(8)
 
     def get_json(self, url, **kwargs):
         response = None
@@ -61,10 +63,10 @@ class Client:
         return request
 
     def get(self, url, **kwargs):
-        return prequests.get(url, **kwargs)
+        return prequests.get(url, session=self.session, **kwargs)
 
     def imap(self, reqs):
-        return prequests.imap(reqs)
+        return prequests.imap(reqs, stream=False, pool=self.pool)
 
 
 def flatten_lists(meta_lists):
