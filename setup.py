@@ -1,6 +1,7 @@
 import codecs
 from setuptools import setup
 
+
 def readme():
     with codecs.open('README.rst', 'r', 'utf-8') as f:
         return f.read()
@@ -24,7 +25,7 @@ setup(
     install_requires=[
         'six',
         'requests',
-        'requests-futures',
+        'git+https://github.com/leVirve/prequests.git#egg=prequests'
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',

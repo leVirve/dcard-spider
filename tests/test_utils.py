@@ -1,5 +1,4 @@
 from dcard import add_handles_on_logger
-from dcard.utils import FutureRequest
 
 
 class TestClient:
@@ -24,38 +23,15 @@ class TestClient:
             'https://test-for-error', error='RetryError')
         assert resp == {}
 
+    def test_get_and_other_error(self, client):
+        resp = client.get_json(
+            'https://test-for-error', error='Exception')
+        assert resp == {}
+
     def test_get_stream(self, client):
         resp = client.get_stream(
             'https://test-for-get-stream')
         assert resp.ok
-
-
-class TestFutureRequest:
-
-    def test_future_request_object(self, client):
-        req = FutureRequest(
-                client, client.session.get('https://test-for-object'))
-        assert req.future
-        assert req.caller
-        assert req.retries == 0
-
-    def test_future_request_json_decode_error(self, client):
-        req = FutureRequest(
-                client,
-                client.session.get(
-                    'https://test-for-future-request',
-                    resp_error='ValueError')
-              )
-        assert not req.json()
-
-    def test_future_request_exceptions(self, client):
-        req = FutureRequest(
-                client,
-                client.session.get(
-                    'https://test-for-future-request',
-                    resp_error=True)
-              )
-        assert not req.json()
 
 
 class TestDcard:

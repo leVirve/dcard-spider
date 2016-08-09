@@ -55,6 +55,8 @@ class MockedRequest:
                 raise e
             elif kwargs.get('error') == 'RetryError':
                 raise RetryError
+            elif kwargs.get('error') == 'Exception':
+                raise Exception
             elif kwargs.get('resp_error'):
                 return JsonResponse(error=kwargs.get('resp_error'))
             else:

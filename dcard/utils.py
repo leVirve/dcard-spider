@@ -5,79 +5,66 @@ import itertools
 from six.moves import http_client as httplib
 
 import requests
+import prequests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 from requests.exceptions import RetryError
-from requests_futures.sessions import FuturesSession
+
 
 logger = logging.getLogger(__name__)
 
 
 class Client:
 
+    max_retries = 5
+
     def __init__(self, workers=8):
         retries = Retry(
-            total=5,
+            total=self.max_retries,
             backoff_factor=0.1,
             status_forcelist=[500, 502, 503, 504])
-        sess = requests.Session()
-        sess.mount('https://', HTTPAdapter(max_retries=retries))
-        self.session = FuturesSession(max_workers=workers, session=sess)
-
-    def fut_get(self, url, **kwargs):
-        return FutureRequest(
-            self, self.session.get(url, **kwargs), **kwargs)
-
-    def get_stream(self, url, **kwargs):
-        request = self.fut_get(url, stream=True, **kwargs)
-        return request.result()
+        session = requests.Session()
+        session.mount('https://', HTTPAdapter(max_retries=retries))
+        self.session = session
 
     def get_json(self, url, **kwargs):
-        request = self.fut_get(url, **kwargs)
-        return request.json()
-
-
-class FutureRequest:
-
-    max_retries = 3
-
-    def __init__(self, caller, future, **kwargs):
-        self.future = future
-        self.caller = caller
-        self.url = kwargs.get('url')
-        self.retries = kwargs.get('retries', 0)
-        self.response = None
-
-    def result(self):
-        return self.future.result()
-
-    def json(self):
         response = None
         try:
-            response = self.response = self.future.result()
+            response = self.session.get(url, **kwargs)
             data = response.json()
             if type(data) is dict and data.get('error'):
                 raise ServerResponsedError
             return data
         except ValueError as e:
+            retries = kwargs.get('retries', 0)
             logger.error('when get <%d> %s, error %s (retry#%d)',
-                         response.status_code, response.url, e, self.retries)
-            return {} if self.retries <= self.max_retries else \
-                self.caller.get_json(response.url, retries=self.retries + 1)
+                         response.status_code, url, e, retries)
+            return {} if retries <= self.max_retries else \
+                self.get_json(url, retries=retries + 1)
         except ServerResponsedError:
             logger.error('when get <%d> %s, response: %s',
-                         response.status_code, response.url, data)
+                         response.status_code, url, data)
             return {}
         except httplib.IncompleteRead as e:
             logger.error('when get %s, error %s; partial: %s',
-                         self.url, e, e.partial)
+                         url, e, e.partial)
             return {}  # or shall we return `e.partial` ?
         except RetryError as e:
-            logger.error('when get %s, retry error occurs. %s', self.url, e)
+            logger.error('when get %s, retry error occurs. %s', url, e)
             return {}
         except Exception as e:
             logger.error('error %s', e)
             return {}
+
+    def get_stream(self, url, **kwargs):
+        request = self.session.get(url, stream=True, **kwargs)
+        return request
+
+    def get(self, url, **kwargs):
+        return prequests.get(url, **kwargs)
+
+    def imap(self, reqs):
+        return prequests.imap(reqs)
 
 
 def flatten_lists(meta_lists):

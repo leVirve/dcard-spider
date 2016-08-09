@@ -31,23 +31,23 @@ class Post:
             'links': self.get_links(self.ids) if links else [],
             'comments': self.get_comments(self.ids, self.metas) if comments else ()
         }
-        return PostsResult(raw_posts, massive=(not self.use_only_id))
+        return PostsResult(
+            raw_posts, self.client, massive=(not self.use_only_id))
 
     def get_content(self, post_ids):
-        content_futures = (
-            self.client.fut_get(
-                api.post_url_pattern.format(post_id=post_id))
+        reqs = (
+            self.client.get(api.post_url_pattern.format(post_id=post_id))
             for post_id in post_ids
         )
-        return content_futures
+        return reqs
 
     def get_links(self, post_ids):
-        links_futures = (
-            self.client.fut_get(
+        reqs = (
+            self.client.get(
                 api.post_links_url_pattern.format(post_id=post_id))
             for post_id in post_ids
         )
-        return links_futures
+        return reqs
 
     def get_comments(self, post_ids, post_metas):
         return (
@@ -60,13 +60,13 @@ class Post:
 
     def get_comments_parallel(self, post_id, comments_count):
         pages = -(-comments_count // self.comments_per_page)
-        comments_futures = (
-            self.client.fut_get(
+        reqs = (
+            self.client.get(
                 api.post_comments_url_pattern.format(post_id=post_id),
                 params={'after': page * self.comments_per_page})
             for page in range(pages)
         )
-        return comments_futures
+        return reqs
 
     def get_comments_serial(self, post_id):
         comments_url = api.post_comments_url_pattern.format(post_id=post_id)
@@ -95,8 +95,9 @@ class PostsResult:
 
     downloader = Downloader()
 
-    def __init__(self, bundle, massive=True):
+    def __init__(self, bundle, client, massive=True):
         logger.info('[PostResult] takes hand.')
+        self.client = client
         self.massive = massive
         self.results = list(self.reformat(bundle))
         logger.info('[PostResult] %d posts processed.', len(self.results))
@@ -112,7 +113,8 @@ class PostsResult:
 
     def reformat(self, bundle):
         for content, links, comments in zip_longest(
-            bundle['content'], bundle['links'], bundle['comments']
+            self.client.imap(bundle['content']),
+            self.client.imap(bundle['links']), bundle['comments']
         ):
             post = {}
             post.update(content.json()) if content else None
@@ -124,7 +126,7 @@ class PostsResult:
                 yield post
 
     def extract_comments(self, comments):
-        return flatten_lists([cmts.json() for cmts in comments]) \
+        return flatten_lists([cs.json() for cs in self.client.imap(comments)]) \
             if self.massive and comments else comments
 
     def parse_resources(self):

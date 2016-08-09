@@ -23,14 +23,14 @@ class TestPosts:
         assert not posts.metas
         assert posts.use_only_id
 
-    def test_get_content(self, dcard):
-        futs = dcard.posts.get_content([9487])
-        result = list(futs)[0]
+    def test_get_content(self, dcard, client):
+        reqs = dcard.posts.get_content([9487])
+        result = list(client.imap(reqs))[0]
         assert isinstance(result.json(), dict)
 
-    def test_get_links(self, dcard):
-        futs = dcard.posts.get_links([9487])
-        result = list(futs)[0]
+    def test_get_links(self, dcard, client):
+        reqs = dcard.posts.get_links([9487])
+        result = list(client.imap(reqs))[0]
         assert isinstance(result.json(), list)
 
     def test_get_comments_serial(self, dcard):
@@ -38,10 +38,10 @@ class TestPosts:
         result = reqs
         assert isinstance(result, list)
 
-    def test_get_comments_parallel(self, dcard, metas):
+    def test_get_comments_parallel(self, dcard, client, metas):
         comments_count = 87
-        futs = dcard.posts.get_comments_parallel(9487, comments_count)
-        result = list(futs)[0]
+        reqs = dcard.posts.get_comments_parallel(9487, comments_count)
+        result = list(client.imap(reqs))[0]
         assert isinstance(result.json(), list)
 
     def test_get_post_bundle(self, dcard):
