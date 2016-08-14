@@ -10,7 +10,7 @@ __all__ = ['Dcard']
 
 class Dcard:
 
-    def __init__(self):
-        self.client = Client()
+    def __init__(self, workers=8):
+        self.client = Client(workers=workers)
         self.forums = Forum(client=self.client)
         self.posts = Post(client=self.client)

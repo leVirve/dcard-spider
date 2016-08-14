@@ -27,7 +27,7 @@ class Client:
         session = requests.Session()
         session.mount('https://', HTTPAdapter(max_retries=retries))
         self.session = session
-        self.pool = Pool(8)
+        self.pool = Pool(workers)
 
     def get_json(self, url, **kwargs):
         response = None
