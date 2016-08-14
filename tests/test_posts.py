@@ -46,14 +46,14 @@ class TestPosts:
 
     def test_get_post_bundle(self, dcard):
         posts = dcard.posts(9487).get()
-        first_post = posts[0]
+        first_post = posts.result()[0]
         comment_count = first_post['commentCount']
         assert comment_count == len(first_post['comments'])
 
     def test_get_post_bundles(self, dcard, metas):
         ids = [m['id'] for m in metas]
-        posts1 = dcard.posts(metas).get(comments=False, links=False)
-        posts2 = dcard.posts(ids).get(comments=False, links=False)
+        posts1 = dcard.posts(metas).get(comments=False, links=False).result()
+        posts2 = dcard.posts(ids).get(comments=False, links=False).result()
         titles = [post['title'] for post in posts1]
         assert len(posts1) == len(posts2)
         assert all(titles)
@@ -62,14 +62,12 @@ class TestPosts:
 class TestPostsResult:
 
     def test_postsresult_from_post_with_ids(self, dcard):
-        posts = dcard.posts(9487).get(comments=False, links=False)
-        assert not posts.massive
+        posts = dcard.posts(9487).get(comments=False, links=False).result()
         assert len(posts) == 1
         assert posts[0] is not None
 
     def test_postsresult_from_post_with_metas(self, dcard, metas):
-        posts = dcard.posts(metas[0]).get(comments=False, links=False)
-        assert posts.massive
+        posts = dcard.posts(metas[0]).get(comments=False, links=False).result()
         assert len(posts) == 1
         assert posts[0] is not None
 

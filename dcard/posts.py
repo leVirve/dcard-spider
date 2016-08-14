@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 import logging
+from itertools import takewhile
 from six.moves import zip_longest
 
 from dcard import api
@@ -26,13 +27,33 @@ class Post:
         return self
 
     def get(self, content=True, links=True, comments=True):
-        raw_posts = {
-            'content': self.get_content(self.ids) if content else [],
-            'links': self.get_links(self.ids) if links else [],
-            'comments': self.get_comments(self.ids, self.metas) if comments else ()
-        }
-        return PostsResult(
-            raw_posts, self.client, massive=(not self.use_only_id))
+
+        def gen_posts():
+            nonlocal content, links, comments
+
+            content = self.get_content(self.ids) if content else []
+            links = self.get_links(self.ids) if links else []
+            comments = self.get_comments(self.ids, self.metas) if comments else ()
+
+            for content, links, comments in zip_longest(
+                self.client.imap(content), self.client.imap(links), comments
+            ):
+                post = {}
+                post.update(content.json()) if content else None
+                post.update({
+                    'links': links.json() if links else None,
+                    'comments': self.extract_comments(comments)
+                })
+                if post:
+                    yield post
+
+            logger.info('[Posts.gen_posts <gen>] Processed.')
+
+        return PostsResult(gen_posts)
+
+    def extract_comments(self, comments):
+        return flatten_lists([cs.json() for cs in self.client.imap(comments)]) \
+            if not self.use_only_id and comments else comments
 
     def get_content(self, post_ids):
         reqs = (
@@ -70,15 +91,16 @@ class Post:
 
     def get_comments_serial(self, post_id):
         comments_url = api.post_comments_url_pattern.format(post_id=post_id)
-
         params = {}
+
+        def gen_cmts():
+            while True:
+                yield self.client.get_json(comments_url, params=params)
+
         comments = []
-        while True:
-            _comments = self.client.get_json(comments_url, params=params)
-            if len(_comments) == 0:
-                break
-            comments += _comments
-            params['after'] = _comments[-1]['floor']
+        for cmts in takewhile(lambda x: len(x), gen_cmts()):
+            comments += cmts
+            params['after'] = cmts[-1]['floor']
 
         return comments
 
@@ -95,39 +117,13 @@ class PostsResult:
 
     downloader = Downloader()
 
-    def __init__(self, bundle, client, massive=True):
+    def __init__(self, generator):
         logger.info('[PostResult] takes hand.')
-        self.client = client
-        self.massive = massive
-        self.results = list(self.reformat(bundle))
-        logger.info('[PostResult] %d posts processed.', len(self.results))
+        self.results = generator()
 
-    def __len__(self):
-        return len(self.results)
-
-    def __iter__(self):
-        return self.results.__iter__()
-
-    def __getitem__(self, key):
-        return self.results[int(key)]
-
-    def reformat(self, bundle):
-        for content, links, comments in zip_longest(
-            self.client.imap(bundle['content']),
-            self.client.imap(bundle['links']), bundle['comments']
-        ):
-            post = {}
-            post.update(content.json()) if content else None
-            post.update({
-                'links': links.json() if links else None,
-                'comments': self.extract_comments(comments)
-            })
-            if post:
-                yield post
-
-    def extract_comments(self, comments):
-        return flatten_lists([cs.json() for cs in self.client.imap(comments)]) \
-            if self.massive and comments else comments
+    def result(self):
+        self.results = list(self.results)
+        return self.results
 
     def parse_resources(self):
         parser = ContentParser(self.results)
