@@ -61,10 +61,10 @@ def download(args):
         posts.downloader.resources_folder = args.output
 
     resources = posts.parse_resources()
-    status, fails = posts.download(resources)
+    cnt, fails = posts.download(resources)
 
-    print('成功下載 %d items！' % posts.downloader.done_resources
-          if all(status) else '出了點錯下載不完全喔')
+    print('成功下載 %d items！' % cnt
+          if not fails else '出了點錯下載不完全喔')
     print('Finish in {0:.5f} sec(s).'.format(time.time() - start_time))
 
-    return all(status), fails
+    return cnt, fails

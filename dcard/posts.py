@@ -116,6 +116,7 @@ class Post:
 class PostsResult:
 
     downloader = Downloader()
+    parser = ContentParser()
 
     def __init__(self, generator):
         logger.info('[PostResult] takes hand.')
@@ -126,9 +127,9 @@ class PostsResult:
         return self.results
 
     def parse_resources(self):
-        parser = ContentParser(self.results)
-        return parser.parse()
+        self.parser.posts = self.results
+        return self.parser.parse()
 
     def download(self, resource_bundles):
-        self.downloader.set_bundles(resource_bundles)
+        self.downloader.resource_bundles = resource_bundles
         return self.downloader.download()

@@ -9,7 +9,7 @@ class TestDownloader:
         urls = []
         bundles = [(metas, urls)]
 
-        downloader.set_bundles(bundles)
-        downloader.download()
+        downloader.resource_bundles = bundles
+        cnt, _ = downloader.download()
 
-        assert downloader.done_resources == 0
+        assert cnt == 0

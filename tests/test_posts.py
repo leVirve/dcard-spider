@@ -85,5 +85,5 @@ class TestPostsResult:
         posts = dcard.posts(9487).get(comments=False, links=False)
         resources = posts.parse_resources()
         status, fails = posts.download(resources)
-        assert all(status)
+        assert type(status) is int
         assert len(fails) == 0
