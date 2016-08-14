@@ -11,25 +11,9 @@ from dcard.utils import Client, flatten_lists
 logger = logging.getLogger(__name__)
 
 
-client = Client()
-
-
-def download(task):
-    filepath, src = task
-
-    if os.path.exists(filepath):
-        return True, src
-
-    response = client.get_stream(src)
-
-    if response.ok:
-        with open(filepath, 'wb') as stream:
-            for chunk in response.iter_content(chunk_size=1024):
-                stream.write(chunk)
-    return (response.ok, src)
-
-
 class Downloader:
+
+    client = Client()
 
     def __init__(
             self, download_folder=None, subfolder_pattern=None, flatten=False):
@@ -43,13 +27,14 @@ class Downloader:
 
         self.mkdir(self.resources_folder)
 
-        tasks = []
-        for meta, urls in self.resource_bundles:
-            tasks += [(self.get_filepath(meta, url), url) for url in urls]
+        tasks = [
+            (self.get_filepath(meta, url), url)
+            for meta, urls in self.resource_bundles
+            for url in urls
+        ]
 
         with contextlib.closing(Pool(8)) as pool:
-            async_results = pool.map_async(download, tasks)
-            results = async_results.get()
+            results = pool.map(self.downloading, tasks)
 
         status = [ok for ok, _ in results]
         fails = [src for ok, src in results if not ok]
@@ -87,6 +72,24 @@ class Downloader:
     def mkdir(path):
         if not os.path.exists(path):
             os.makedirs(path)
+
+    @staticmethod
+    def save_file(resp, path):
+        with open(path, 'wb') as stream:
+            for chunk in resp.iter_content(chunk_size=1024):
+                stream.write(chunk)
+
+    @classmethod
+    def downloading(cls, task):
+        filepath, src = task
+
+        if os.path.exists(filepath):
+            return True, src
+        response = cls.client.get_stream(src)
+
+        if response.ok:
+            cls.save_file(response, filepath)
+        return (response.ok, src)
 
 
 class ContentParser:
