@@ -28,15 +28,13 @@ class Post:
 
     def get(self, content=True, links=True, comments=True):
 
+        _content = self.get_content(self.ids) if content else []
+        _links = self.get_links(self.ids) if links else []
+        _comments = self.get_comments(self.ids, self.metas) if comments else ()
+
         def gen_posts():
-            nonlocal content, links, comments
-
-            content = self.get_content(self.ids) if content else []
-            links = self.get_links(self.ids) if links else []
-            comments = self.get_comments(self.ids, self.metas) if comments else ()
-
             for content, links, comments in zip_longest(
-                self.client.imap(content), self.client.imap(links), comments
+                self.client.imap(_content), self.client.imap(_links), _comments
             ):
                 post = {}
                 post.update(content.json()) if content else None
