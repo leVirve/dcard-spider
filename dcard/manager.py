@@ -6,14 +6,14 @@ import logging
 import contextlib
 from multiprocessing.dummy import Pool
 
-from dcard.utils import Client, flatten_lists
+from dcard.utils import flatten_lists
 
 logger = logging.getLogger(__name__)
 
 
 class Downloader:
 
-    client = Client()
+    client = None
 
     def __init__(
             self, download_folder=None, subfolder_pattern=None, flatten=False):
