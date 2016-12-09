@@ -17,7 +17,8 @@ Installation
 ------------
 ::
 
-    $ pip install dcard-spider --process-dependency-links
+    $ pip install git+https://github.com/leVirve/prequests#egg=prequests-0.1.1
+    $ pip install dcard-spider
 
 Dependencies
 ------------
