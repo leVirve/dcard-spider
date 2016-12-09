@@ -61,7 +61,7 @@ Command line
 ::
 
     dcard download -f [forums name] -n [number of posts]
-    
+
     (options:)
             -likes      [likes threshold]
             -b          [specified a starting post ID]
@@ -106,6 +106,26 @@ Basic
     ids = [meta['id'] for meta in ariticle_metas]
     articles = dcard.posts(ids).get()
     articles = dcard.posts(ariticle_metas).get()
+
+-  操作文章結果 `PostsResult` 物件
+
+.. code:: python
+
+   # 存取 articles 中的內容
+   # 1. articles.results -> get a `generator()`
+
+   for article in articles.results:
+       # `article` is a Python dict() object
+
+   # 2. articles.result() -> get a `list()`
+   for article in articles.result():
+       # `article` is a Python dict() object
+
+   # 3. Dumps all articles data into file directly
+   import json
+
+   with open('output.json', 'w', encoding='utf-8') as f:
+       json.dump(articles.result(), f, ensure_ascii=False)
 
 -  下載文章中的資源 (目前支援文中 imgur 連結的圖片)
 
@@ -193,7 +213,7 @@ Inspirations
 `Aragorn's <https://github.com/LordElessar>`_ downloader funtional request
 
 
-.. |PyPI| image:: https://img.shields.io/pypi/v/dcard-spider.svg?style=flat-square 
+.. |PyPI| image:: https://img.shields.io/pypi/v/dcard-spider.svg?style=flat-square
     :target: https://pypi.python.org/pypi/dcard-spider
 .. |Build Status| image:: https://img.shields.io/travis/leVirve/dcard-spider/master.svg?style=flat-square
    :target: https://travis-ci.org/leVirve/dcard-spider
