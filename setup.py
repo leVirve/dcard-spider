@@ -30,8 +30,7 @@ setup(
     },
     install_requires=[
         'six',
-        'requests',
-        'prequests>=0.1.1'
+        'requests'
     ],
     dependency_links=[
         'https://github.com/leVirve/prequests/tarball/master#egg=prequests-0.1.1'

@@ -17,7 +17,7 @@ Installation
 ------------
 ::
 
-    $ pip install dcard-spider
+    $ pip install dcard-spider --process-dependency-links
 
 Dependencies
 ------------
