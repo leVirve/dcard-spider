@@ -6,9 +6,15 @@ def readme():
     with codecs.open('README.rst', 'r', 'utf-8') as f:
         return f.read()
 
+def version():
+    with open('dcard/__init__.py') as f:
+        for line in f:
+            if line.startswith('__version__'):
+                return line.replace("'", '').split()[-1]
+
 setup(
     name='dcard-spider',
-    version='0.2.11',
+    version=version(),
     url='http://github.com/leVirve/dcard-spider',
     description='A spider for Dcard through its newest API.',
     long_description=readme(),

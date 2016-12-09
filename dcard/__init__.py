@@ -6,7 +6,7 @@ from logging import NullHandler
 from dcard.dcard import Dcard  # noqa
 
 
-__version__ = '0.2.11'
+__version__ = '0.2.12'
 __author__ = 'Salas leVirve'
 
 
