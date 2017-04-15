@@ -46,7 +46,10 @@ class Forum:
         return results
 
     def get_paged_metas(self, sort, num, before, timebound=''):
-        params = {'popular': sort == 'popular', 'before': before}
+        params = {}
+        params['popular'] = 'true' if sort == 'popular' else 'false'
+        if before:
+            params['before'] = before
         pages = -(-num // self.metas_per_page)
 
         def filter_metas(metas):
