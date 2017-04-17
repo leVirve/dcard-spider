@@ -211,7 +211,7 @@ Inspirations
 `SLMT's <https://github.com/SLMT>`_
 `dcard-crawler <https://github.com/SLMT/dcard-crawler>`_
 
-`Aragorn's <https://github.com/LordElessar>`_ downloader funtional request
+`Aragorn's <https://github.com/Elessar116>`_ downloader funtional request
 
 
 .. |PyPI| image:: https://img.shields.io/pypi/v/dcard-spider.svg?style=flat-square
