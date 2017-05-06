@@ -17,12 +17,11 @@ Installation
 ------------
 ::
 
-    $ pip install git+https://github.com/leVirve/prequests#egg=prequests-0.1.1
     $ pip install dcard-spider
 
 Dependencies
 ------------
-* Python 2.7+, Python 3.3+
+* Python 2.7+, Python 3.4+
 
 Example
 -------

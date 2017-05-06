@@ -10,6 +10,7 @@ by futures. All API methods return a ``Request`` instance (as opposed to
 """
 
 import traceback
+import contextlib
 from functools import partial
 from multiprocessing.dummy import Pool
 

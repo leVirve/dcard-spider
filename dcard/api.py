@@ -1,8 +1,19 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, absolute_import
 import logging
-from functools import partialmethod
 from itertools import takewhile, count
+try:
+    from functools import partialmethod
+except ImportError:
+    from functools import partial
+
+    class partialmethod(partial):
+        def __get__(self, instance, owner):
+            if instance is None:
+                return self
+            return partial(
+                self.func, instance,
+                *(self.args or ()), **(self.keywords or {}))
 
 from six.moves import zip
 

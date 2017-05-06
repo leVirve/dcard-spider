@@ -48,15 +48,15 @@ class Post:
 
         return PostsResult(gen_posts)
 
-    def extract_comments(self, comments):
-        return flatten_lists([cs.json() for cs in api.imap(comments)]) \
-            if not self.only_id and comments else comments
-
     def gen_content_reqs(self, post_ids):
         return (api.get_post(post_id) for post_id in post_ids)
 
     def gen_links_reqs(self, post_ids):
         return (api.get_post_links(post_id) for post_id in post_ids)
+
+    def extract_comments(self, comments):
+        return flatten_lists([cs.json() for cs in api.imap(comments)]) \
+            if not self.only_id and comments else comments
 
     def get_comments(self, post_ids, post_metas):
         return (
