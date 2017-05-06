@@ -8,28 +8,28 @@ class TestPosts:
         posts = dcard.posts
         assert not posts.ids
         assert not posts.metas
-        assert not posts.use_only_id
+        assert not posts.only_id
 
     def test_with_metas_through__call__(self, dcard, metas):
         posts = dcard.posts(metas)
         assert posts.ids
         assert posts.metas
-        assert not posts.use_only_id
+        assert not posts.only_id
 
     def test_with_ids_through__call__(self, dcard, metas):
         ids = [m['id'] for m in metas]
         posts = dcard.posts(ids)
         assert posts.ids
         assert not posts.metas
-        assert posts.use_only_id
+        assert posts.only_id
 
-    def test_get_content(self, dcard, client):
-        reqs = dcard.posts.get_content([9487])
+    def test_gen_content_reqs(self, dcard, client):
+        reqs = dcard.posts.gen_content_reqs([9487])
         result = list(client.imap(reqs))[0]
         assert isinstance(result.json(), dict)
 
-    def test_get_links(self, dcard, client):
-        reqs = dcard.posts.get_links([9487])
+    def test_gen_links_reqs(self, dcard, client):
+        reqs = dcard.posts.gen_links_reqs([9487])
         result = list(client.imap(reqs))[0]
         assert isinstance(result.json(), list)
 

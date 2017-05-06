@@ -77,6 +77,7 @@ def send(r, stream=False):
     r.send(stream=stream)
     return r.response
 
+
 # Shortcuts for creating AsyncRequest with appropriate HTTP method
 get = partial(AsyncRequest, 'GET')
 options = partial(AsyncRequest, 'OPTIONS')

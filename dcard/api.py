@@ -10,14 +10,6 @@ from dcard.utils import Client
 
 logger = logging.getLogger(__name__)
 
-DOMAIN = 'https://www.dcard.tw/'
-
-forums_url = DOMAIN + '_api/forums'
-post_url_pattern = DOMAIN + '_api/posts/{post_id}'
-posts_meta_url_pattern = DOMAIN + '_api/forums/{forum}/posts'
-post_links_url_pattern = DOMAIN + '_api/posts/{post_id}/links'
-post_comments_url_pattern = DOMAIN + '_api/posts/{post_id}/comments'
-
 
 class Api():
 
@@ -71,6 +63,18 @@ class Api():
                 return
             yield metas
 
+    def get_post(self, post_id, addition=None, params=None):
+        req = self.client.get(route.post(post_id, addition=addition), params=params)
+        return req
+
+    get_post_links = partialmethod(get_post, addition='links')
+
+    def imap(self, *args, **kwargs):
+        return self.client.imap(*args, **kwargs)
+
+    def get_json(self, *args, **kwargs):
+        return self.client.get_json(*args, **kwargs)
+
 
 class Route():
 
@@ -85,7 +89,7 @@ class Route():
     def post(self, post_id, addition=None):
         base = Route.host + '_api/posts/{id}'.format(id=post_id)
         if addition:
-            return base + addition
+            return base + '/' + addition
         return base
 
     post_links = partialmethod(post, addition='links')

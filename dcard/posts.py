@@ -4,7 +4,7 @@ import logging
 from itertools import takewhile
 from six.moves import zip_longest
 
-from dcard import api
+from dcard.api import api, route
 from dcard.manager import ContentParser, Downloader
 from dcard.utils import flatten_lists
 
@@ -15,11 +15,10 @@ class Post:
 
     comments_per_page = 30
 
-    def __init__(self, metadata=None, client=None):
-        self.use_only_id = False
+    def __init__(self, metadata=None):
+        self.only_id = False
         self.ids = []
         self.metas = None
-        self.client = client
         self._initial_metadata(metadata)
 
     def __call__(self, value):
@@ -28,13 +27,13 @@ class Post:
 
     def get(self, content=True, links=True, comments=True):
 
-        _content = self.get_content(self.ids) if content else []
-        _links = self.get_links(self.ids) if links else []
+        _content = self.gen_content_reqs(self.ids) if content else []
+        _links = self.gen_links_reqs(self.ids) if links else []
         _comments = self.get_comments(self.ids, self.metas) if comments else ()
 
         def gen_posts():
             for content, links, comments in zip_longest(
-                self.client.imap(_content), self.client.imap(_links), _comments
+                api.imap(_content), api.imap(_links), _comments
             ):
                 post = {}
                 post.update(content.json()) if content else None
@@ -50,23 +49,14 @@ class Post:
         return PostsResult(gen_posts)
 
     def extract_comments(self, comments):
-        return flatten_lists([cs.json() for cs in self.client.imap(comments)]) \
-            if not self.use_only_id and comments else comments
+        return flatten_lists([cs.json() for cs in api.imap(comments)]) \
+            if not self.only_id and comments else comments
 
-    def get_content(self, post_ids):
-        reqs = (
-            self.client.get(api.post_url_pattern.format(post_id=post_id))
-            for post_id in post_ids
-        )
-        return reqs
+    def gen_content_reqs(self, post_ids):
+        return (api.get_post(post_id) for post_id in post_ids)
 
-    def get_links(self, post_ids):
-        reqs = (
-            self.client.get(
-                api.post_links_url_pattern.format(post_id=post_id))
-            for post_id in post_ids
-        )
-        return reqs
+    def gen_links_reqs(self, post_ids):
+        return (api.get_post_links(post_id) for post_id in post_ids)
 
     def get_comments(self, post_ids, post_metas):
         return (
@@ -80,20 +70,19 @@ class Post:
     def get_comments_parallel(self, post_id, comments_count):
         pages = -(-comments_count // self.comments_per_page)
         reqs = (
-            self.client.get(
-                api.post_comments_url_pattern.format(post_id=post_id),
+            api.get_post(
+                post_id, 'comments',
                 params={'after': page * self.comments_per_page})
             for page in range(pages)
         )
         return reqs
 
     def get_comments_serial(self, post_id):
-        comments_url = api.post_comments_url_pattern.format(post_id=post_id)
         params = {}
 
         def gen_cmts():
             while True:
-                yield self.client.get_json(comments_url, params=params)
+                yield api.get_json(route.post_comments(post_id), params=params)
 
         comments = []
         for cmts in takewhile(lambda x: len(x), gen_cmts()):
@@ -106,9 +95,9 @@ class Post:
         if not metadata:
             return
         metadata = metadata if isinstance(metadata, list) else [metadata]
-        self.use_only_id = type(metadata[0]) is int
-        self.ids = metadata if self.use_only_id else [m['id'] for m in metadata]
-        self.metas = metadata if not self.use_only_id else None
+        self.only_id = type(metadata[0]) is int
+        self.ids = metadata if self.only_id else [m['id'] for m in metadata]
+        self.metas = None if self.only_id else metadata
 
 
 class PostsResult:
