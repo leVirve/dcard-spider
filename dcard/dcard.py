@@ -17,9 +17,7 @@ class Dcard:
     def __init__(self, workers=8):
         self.forums = Forum()
         self.posts = Post()
-
-        self.client = Client(workers=workers)
-        Downloader.client = self.client
+        Downloader.client = Client(workers=workers)
 
 
 class Forum:

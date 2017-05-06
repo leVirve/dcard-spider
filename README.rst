@@ -5,7 +5,7 @@ dcard-spider
 
 Get posts and forums resourses through Dcard practical API on website.
 
-    *Originally this is a module of my another project leVirve/dcard-lumberjack <https://github.com/leVirve/dcard-lumberjack>.*
+    *Originally this is a module of my another project dcard-lumberjack <https://github.com/leVirve/dcard-lumberjack>.*
 
 
 Feature
@@ -13,7 +13,7 @@ Feature
 Embrace asynchronous tasks and multithreads. All works done in parallel or coroutine-like.
 **Spider needs for speed.**
 
-Installation
+Install
 ------------
 ::
 
@@ -25,6 +25,14 @@ Dependencies
 
 Example
 -------
+Download images from the posts in specific forum.
+
+* Through command
+.. code:: bash
+
+    dcard download --forum photography --number 100
+
+* Through programmable API
 .. code:: python
 
     from dcard import Dcard
@@ -46,15 +54,41 @@ Example
         status, fails = posts.download(resources)
         print('成功下載！' if all(status) else '出了點錯下載不完全喔')
 
-.. figure:: https://raw.githubusercontent.com/leVirve/dcard-spider/master/docs/img/snapshot.png
+.. image:: https://raw.githubusercontent.com/leVirve/dcard-spider/master/docs/img/snapshot.png
     :width: 600px
-    :align: center
-    :alt: Demo result
-    :figclass: align-center
 
 
 Usage
 -----
+
+Full Commands
+~~~~~~~~~~~~
+.. code:: bash
+
+    $ dcard -h
+
+    usage: dcard [-h] [-f FORUM] [-n NUMBER] [-b BEFORE] [-likes LIKES_THRESHOLD]
+                 [-o OUTPUT] [-F] [-v] [-V]
+                 mode
+
+    positional arguments:
+    mode                  download / meta mode
+
+    optional arguments:
+    -h, --help              show this help message and exit
+    -f FORUM, --forum FORUM
+                            Specific which forum
+    -n NUMBER, --number NUMBER
+                            Scan through how many posts
+    -b BEFORE, --before BEFORE
+                            Scan through before specified post ID
+    -likes LIKES_THRESHOLD, --likes_threshold LIKES_THRESHOLD
+                            Specific minimum like counts
+    -o OUTPUT, --output OUTPUT
+                            Specific folder to store the resources
+    -F, --flatten           Option for flattening folders
+    -v, --verbose           Logging verbose information
+    -V, --version           show program's version number and exit
 
 Command line
 ~~~~~~~~~~~~
