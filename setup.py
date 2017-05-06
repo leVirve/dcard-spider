@@ -6,11 +6,13 @@ def readme():
     with codecs.open('README.rst', 'r', 'utf-8') as f:
         return f.read()
 
+
 def version():
     with open('dcard/__init__.py') as f:
         for line in f:
             if line.startswith('__version__'):
                 return line.replace("'", '').split()[-1]
+
 
 setup(
     name='dcard-spider',
@@ -48,11 +50,8 @@ setup(
         'Topic :: Utilities',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.2',
-        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6'
