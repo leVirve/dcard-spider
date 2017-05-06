@@ -93,6 +93,9 @@ Basic
     ariticle_metas = dcard.forums('funny').get_metas(num=150, sort='new')
     ariticle_metas = dcard.forums('funny').get_metas(num=100, sort='popular')
 
+    # get all the metas from forum
+    ariticle_metas = dcard.forums('funny').get_metas(num=Forum.infinite_page, sort='popular')
+
 -  提供一次取得多篇文章詳細資訊(全文、引用連結、所有留言)
 
 .. code:: python

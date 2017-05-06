@@ -9,7 +9,6 @@ class TestForums:
         name = 'testclass'
         f = dcard.forums(name)
         assert name == f.name
-        assert name in f.posts_meta_url
 
     def test_get_all_forums(self, dcard):
         all_fourums = dcard.forums.get()
@@ -23,9 +22,6 @@ class TestForums:
         all_fourums = dcard.forums.get()
         no_school_fourums = dcard.forums.get(no_school=True)
         assert len(all_fourums) > len(no_school_fourums)
-
-        extracted = dcard.forums._extract_general(all_fourums)
-        assert len(no_school_fourums) == len(list(extracted))
 
     def test_get_metas_with_sort_param(self, dcard):
         name = 'testclass'
@@ -42,6 +38,11 @@ class TestForums:
         assert len(forum.get_metas(num=33)) == 33
         assert len(forum.get_metas(num=87)) == 87
         assert len(forum.get_metas(num=999)) == 999
+
+    def test_get_metas_with_before_param(self, dcard):
+        name = 'testclass'
+        forum = dcard.forums(name)
+        assert len(forum.get_metas(before=24561)) != 0
 
     def test_get_metas_with_time_bound_param(self, dcard, boundary_date):
         name = 'testclass'

@@ -6,10 +6,11 @@ from multiprocessing.dummy import Pool
 from six.moves import http_client as httplib
 
 import requests
-import prequests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 from requests.exceptions import RetryError
+
+from dcard import prequests
 
 
 logger = logging.getLogger(__name__)
