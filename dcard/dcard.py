@@ -4,8 +4,7 @@ import logging
 
 from dcard.api import api
 from dcard.posts import Post
-from dcard.manager import Downloader
-from dcard.utils import Client, flatten_lists
+from dcard.utils import flatten_lists
 
 __all__ = ['Dcard']
 
@@ -14,10 +13,9 @@ logger = logging.getLogger(__name__)
 
 class Dcard:
 
-    def __init__(self, workers=8):
+    def __init__(self):
         self.forums = Forum()
         self.posts = Post()
-        Downloader.client = Client(workers=workers)
 
 
 class Forum:

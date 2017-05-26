@@ -6,14 +6,13 @@ import logging
 import contextlib
 from multiprocessing.dummy import Pool
 
+from dcard.api import api
 from dcard.utils import flatten_lists
 
 logger = logging.getLogger(__name__)
 
 
 class Downloader:
-
-    client = None
 
     def __init__(
             self, download_folder=None, subfolder_pattern=None, flatten=False):
@@ -85,7 +84,7 @@ class Downloader:
 
         if os.path.exists(filepath):
             return True, src
-        response = cls.client.get_stream(src)
+        response = api.client.get_stream(src)
 
         if response.ok:
             cls.save_file(response, filepath)
