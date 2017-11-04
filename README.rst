@@ -1,38 +1,59 @@
-dcard-spider
-============
+Dcard 爬蟲: dcard-spider
+========================
 
 |Build Status| |Coverage Status| |PyPI| |Land Health|
 
-Get posts and forums resourses through Dcard practical API on website.
-
-    *Originally this is a module of my another project dcard-lumberjack <https://github.com/leVirve/dcard-lumberjack>.*
-
-
-Feature
--------
-Embrace asynchronous tasks and multithreads. All works done in parallel or coroutine-like.
+快如閃電的爬蟲，迅速獲得 Dcard 上所有看板的文章!
 **Spider needs for speed.**
 
-Install
+    *Related to my side project dcard-lumberjack <https://github.com/leVirve/dcard-lumberjack>.*
+
+
+特色
+-------
+* 一行指令下載看板內的所有文章及圖片
+* 可程式化的 API 提供更靈活的操作
+* 使用非同步 (asynchronous) 及 多執行序 (multithreading) 來平行完成併發任務達到最大校效率
+
+
+安裝
 ------------
 ::
 
     $ pip install dcard-spider
 
-Dependencies
+必要需求
 ------------
-* Python 2.7+, Python 3.4+
+* Python 2.7+ or Python 3.4+
 
-Example
--------
-Download images from the posts in specific forum.
+使用範例
+--------
+下載指定看板中文章內的圖片
 
-* Through command
+.. image:: https://raw.githubusercontent.com/leVirve/dcard-spider/master/docs/img/snapshot.png
+    :width: 600px
+
+直接使用 command line
+~~~~~~~~~~~~~~~~~~~~~~
+
 .. code:: bash
 
-    dcard download --forum photography --number 100
+    dcard download -f photography -n 100
 
-* Through programmable API
+* 下載指令詳解
+::
+
+    dcard download -f [forums 看板名稱] -n [數量]
+
+    (額外參數:)
+            -likes      [likes 過濾門檻]
+            -b          [指定起始文章 ID]
+            -o          [輸出至...資料夾]
+            -F          [平面化子資料夾 (各文章圖片在同一資料夾)]
+
+透過程式 API
+~~~~~~~~~~~~
+
 .. code:: python
 
     from dcard import Dcard
@@ -54,15 +75,12 @@ Download images from the posts in specific forum.
         status, fails = posts.download(resources)
         print('成功下載！' if all(status) else '出了點錯下載不完全喔')
 
-.. image:: https://raw.githubusercontent.com/leVirve/dcard-spider/master/docs/img/snapshot.png
-    :width: 600px
 
+詳細方法
+--------
 
-Usage
------
-
-Full Commands
-~~~~~~~~~~~~
+Command-line 可用參數
+~~~~~~~~~~~~~~~~~~~~~
 .. code:: bash
 
     $ dcard -h
@@ -72,37 +90,19 @@ Full Commands
                  mode
 
     positional arguments:
-    mode                  download / meta mode
+    mode                        download / meta mode
 
     optional arguments:
-    -h, --help              show this help message and exit
-    -f FORUM, --forum FORUM
-                            Specific which forum
-    -n NUMBER, --number NUMBER
-                            Scan through how many posts
-    -b BEFORE, --before BEFORE
-                            Scan through before specified post ID
+    -h, --help                  show this help message and exit
+    -f FORUM, --forum FORUM     Specific which forum
+    -n NUMBER, --number NUMBER  Scan through how many posts
+    -b BEFORE, --before BEFORE  Scan through before specified post ID
     -likes LIKES_THRESHOLD, --likes_threshold LIKES_THRESHOLD
-                            Specific minimum like counts
-    -o OUTPUT, --output OUTPUT
-                            Specific folder to store the resources
-    -F, --flatten           Option for flattening folders
-    -v, --verbose           Logging verbose information
-    -V, --version           show program's version number and exit
-
-Command line
-~~~~~~~~~~~~
-::
-
-    dcard download -f [forums name] -n [number of posts]
-
-    (options:)
-            -likes      [likes threshold]
-            -b          [specified a starting post ID]
-            -o          [output download folder]
-            -v          [display and logging more info during execution]
-            -F          [flatten all subfolders]
-            -V          [show version of dcard-spider]
+                                Specific minimum like counts
+    -o OUTPUT, --output OUTPUT  Specific folder to store the resources
+    -F, --flatten               Option for flattening folders
+    -v, --verbose               Logging verbose information
+    -V, --version               show program's version number and exit
 
 Basic
 ~~~~~
