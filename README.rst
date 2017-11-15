@@ -73,7 +73,7 @@ Dcard 爬蟲: dcard-spider
         resources = posts.parse_resources()
 
         status, fails = posts.download(resources)
-        print('成功下載！' if all(status) else '出了點錯下載不完全喔')
+        print('成功下載！' if len(fails) == 0 else '出了點錯下載不完全喔')
 
 
 詳細方法
