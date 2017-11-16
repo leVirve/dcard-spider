@@ -3,7 +3,8 @@ from __future__ import absolute_import
 import logging
 from logging import NullHandler
 
-from dcard.dcard import Dcard  # noqa
+from dcard.dcard import Dcard, Forum  # noqa
+from dcard.posts import Post  # noqa
 
 
 __version__ = '0.3.0'
