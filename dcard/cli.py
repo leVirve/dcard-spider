@@ -26,6 +26,10 @@ parser.add_argument(
     '-v', '--verbose', action='store_true', help='Logging verbose information')
 parser.add_argument(
     '-V', '--version', action='version', version=dcard.__version__)
+parser.add_argument(
+    '-c', '--comment', action='store_true', help='Option for scrape comments')
+parser.add_argument(
+    '-l', '--link', action='store_true', help='Option for scrape links')
 
 
 def main(args=None):
@@ -52,7 +56,7 @@ def download(args):
     metas = dcard \
         .forums(args.forum) \
         .get_metas(num=args.number, before=args.before, callback=metas_filter)
-    posts = dcard.posts(metas).get(comments=False, links=False)
+    posts = dcard.posts(metas).get(comments=args.comment, links=args.link)
 
     if args.flatten:
         posts.downloader.subfolder_pattern = '[{likeCount}推] {id}-{folder_name}'
