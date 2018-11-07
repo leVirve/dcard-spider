@@ -5,13 +5,6 @@ import pytest
 from dcard import Dcard
 from dcard.utils import Client
 
-from tests.mocked import MockedRequest
-
-
-@pytest.fixture(autouse=True)
-def mock_all_requests(monkeypatch):
-    monkeypatch.setattr('requests.sessions.Session.request', MockedRequest.request)
-
 
 @pytest.fixture(scope='module')
 def dcard():
@@ -25,7 +18,7 @@ def boundary_date():
 
 @pytest.fixture(scope='module')
 def metas(dcard):
-    return dcard.forums('testfixure').get_metas()
+    return dcard.forums('photography').get_metas()
 
 
 @pytest.fixture(scope='module')

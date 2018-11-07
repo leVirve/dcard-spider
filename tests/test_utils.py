@@ -1,7 +1,9 @@
 from dcard import add_handles_on_logger
 
 
-class TestClient:
+class _TestClient:
+    """TODO(salas) Deprecrated unit test, to be deleted.
+    """
 
     def test_get_and_server_responsed_error(self, client):
         resp = client.get_json(
