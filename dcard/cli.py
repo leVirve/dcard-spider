@@ -30,6 +30,8 @@ parser.add_argument(
     '-c', '--comment', action='store_true', help='Option for scrape comments')
 parser.add_argument(
     '-l', '--link', action='store_true', help='Option for scrape links')
+parser.add_argument(
+    '-p', '--popular', action='store_const', const='popular', default='new', help='Sort post by popularity')
 
 
 def main(args=None):
@@ -55,7 +57,7 @@ def download(args):
 
     metas = dcard \
         .forums(args.forum) \
-        .get_metas(num=args.number, before=args.before, callback=metas_filter)
+        .get_metas(num=args.number, before=args.before, callback=metas_filter, sort=args.popular)
     posts = dcard.posts(metas).get(comments=args.comment, links=args.link)
 
     if args.flatten:
