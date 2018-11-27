@@ -86,7 +86,7 @@ Command-line 可用參數
     $ dcard -h
 
     usage: dcard [-h] [-f FORUM] [-n NUMBER] [-b BEFORE] [-likes LIKES_THRESHOLD]
-                 [-o OUTPUT] [-F] [-v] [-V]
+                 [-o OUTPUT] [-F] [-v] [-V] [-c] [-l] [-p]
                  mode
 
     positional arguments:
@@ -103,6 +103,9 @@ Command-line 可用參數
     -F, --flatten               Option for flattening folders
     -v, --verbose               Logging verbose information
     -V, --version               show program's version number and exit
+    -c, --comment               Option for scrape comments
+    -l, --link                  Option for scrape links
+    -p, --popular               Sort post by popularity
 
 Basic
 ~~~~~
