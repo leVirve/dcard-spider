@@ -16,14 +16,17 @@ from multiprocessing.dummy import Pool
 
 try:
     from requests import Session
+    from fake_useragent import UserAgent
 except ImportError:
-    raise RuntimeError('requests is required for prequests')
+    raise RuntimeError('`requests` and `fake_useragent` are required.')
 
 
 __all__ = (
     'map', 'imap', 'imap_unordered',
     'get', 'options', 'head', 'post', 'put', 'patch', 'delete', 'request'
 )
+
+ua = UserAgent()
 
 
 class AsyncRequest(object):
@@ -44,6 +47,7 @@ class AsyncRequest(object):
         self.session = kwargs.pop('session', None)
         if self.session is None:
             self.session = Session()
+            self.session.headers['User-Agent'] = ua.random
 
         callback = kwargs.pop('callback', None)
         if callback:
@@ -56,8 +60,8 @@ class AsyncRequest(object):
 
     def send(self, **kwargs):
         """
-        Prepares request based on parameter passed to constructor and optional ``kwargs```.
-        Then sends request and saves response to :attr:`response`
+        Prepares request based on parameter passed to constructor and optional
+        ``kwargs```. Then sends request and saves response to :attr:`response`.
 
         :returns: ``Response``
         """

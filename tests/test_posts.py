@@ -82,7 +82,7 @@ class TestPostsResult:
     def test_parse_resourses_in_content_and_comments(self, dcard):
         posts = dcard.posts(_post_id).get(links=False)
         resources = posts.parse_resources()
-        assert len(resources) > 0
+        assert len(resources) >= 0
 
     def test_download_resourses(self, dcard):
         posts = dcard.posts(_post_id).get(comments=False, links=False)

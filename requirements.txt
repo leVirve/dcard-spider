@@ -1,2 +1,3 @@
 six
 requests
+fake_useragent

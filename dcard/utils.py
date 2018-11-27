@@ -27,6 +27,7 @@ class Client:
             status_forcelist=[500, 502, 503, 504])
         session = requests.Session()
         session.mount('https://', HTTPAdapter(max_retries=retries))
+        session.headers['User-Agent'] = prequests.ua.random
         self.session = session
         self.pool = Pool(workers)
 

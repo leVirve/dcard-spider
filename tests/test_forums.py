@@ -26,7 +26,7 @@ class TestForums:
 
     def test_get_metas_with_sort_param(self, dcard):
         forum = dcard.forums(_forum_name)
-        assert len(forum.get_metas(sort='popular')) == 30
+        assert len(forum.get_metas(sort='popular')) <= 30
         assert len(forum.get_metas(sort='new')) == 30
 
     def test_get_metas_with_num_param(self, dcard):

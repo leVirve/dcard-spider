@@ -7,7 +7,7 @@ from dcard.dcard import Dcard, Forum  # noqa
 from dcard.posts import Post  # noqa
 
 
-__version__ = '0.3.0'
+__version__ = '0.3.1'
 __author__ = 'Salas leVirve'
 
 

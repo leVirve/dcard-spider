@@ -1,17 +1,19 @@
 language: python
 cache: pip
+dist: xenial
 python:
   - "2.7"
   - "3.4"
   - "3.5"
   - "3.6"
+  - "3.7"
 
 before_install:
   - pip install pytest-cov
   - pip install coveralls
 
 install:
-  - pip install -r requirements.txt
+  - python setup.py install
 
 script:
   - py.test --cov=dcard tests/

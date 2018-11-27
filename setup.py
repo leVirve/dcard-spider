@@ -32,10 +32,8 @@ setup(
     },
     install_requires=[
         'six',
-        'requests'
-    ],
-    dependency_links=[
-        'https://github.com/leVirve/prequests/tarball/master#egg=prequests-0.1.1'
+        'requests',
+        'fake_useragent'
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',
@@ -54,6 +52,7 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6'
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ]
 )
